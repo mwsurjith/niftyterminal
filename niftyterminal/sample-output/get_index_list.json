@@ -1,0 +1,838 @@
+{
+  "indexList": [
+    {
+      "indexName": "NIFTY 50",
+      "indexSymbol": "NIFTY 50",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": true
+    },
+    {
+      "indexName": "NIFTY BANK",
+      "indexSymbol": "NIFTY BANK",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": true
+    },
+    {
+      "indexName": "NIFTY FINANCIAL SERVICES",
+      "indexSymbol": "NIFTY FIN SERVICE",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": true
+    },
+    {
+      "indexName": "NIFTY MIDCAP SELECT",
+      "indexSymbol": "NIFTY MID SELECT",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": true
+    },
+    {
+      "indexName": "NIFTY NEXT 50",
+      "indexSymbol": "NIFTY NEXT 50",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": true
+    },
+    {
+      "indexName": "NIFTY 100",
+      "indexSymbol": "NIFTY 100",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY 200",
+      "indexSymbol": "NIFTY 200",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY 500",
+      "indexSymbol": "NIFTY 500",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY INDIA FPI 150",
+      "indexSymbol": "NIFTY FPI 150",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY LARGEMIDCAP 250",
+      "indexSymbol": "NIFTY LARGEMID250",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY MICROCAP 250",
+      "indexSymbol": "NIFTY MICROCAP250",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY MIDCAP 100",
+      "indexSymbol": "NIFTY MIDCAP 100",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY MIDCAP 150",
+      "indexSymbol": "NIFTY MIDCAP 150",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY MIDCAP 50",
+      "indexSymbol": "NIFTY MIDCAP 50",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY MIDSMALLCAP 400",
+      "indexSymbol": "NIFTY MIDSML 400",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY SMALLCAP 100",
+      "indexSymbol": "NIFTY SMLCAP 100",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY SMALLCAP 250",
+      "indexSymbol": "NIFTY SMLCAP 250",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY SMALLCAP 50",
+      "indexSymbol": "NIFTY SMLCAP 50",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY TOTAL MARKET",
+      "indexSymbol": "NIFTY TOTAL MKT",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY500 LARGEMIDSMALL EQUAL-CAP WEIGHTED",
+      "indexSymbol": "NIFTY500 LMS EQL",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY500 MULTICAP 50:25:25",
+      "indexSymbol": "NIFTY500 MULTICAP",
+      "subType": "Broad Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY AUTO",
+      "indexSymbol": "NIFTY AUTO",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY CHEMICALS",
+      "indexSymbol": "NIFTY CHEMICALS",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY CONSUMER DURABLES",
+      "indexSymbol": "NIFTY CONSR DURBL",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY FINANCIAL SERVICES EX-BANK",
+      "indexSymbol": "NIFTY FINSEREXBNK",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY FINANCIAL SERVICES 25/50",
+      "indexSymbol": "NIFTY FINSRV25 50",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY FMCG",
+      "indexSymbol": "NIFTY FMCG",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY HEALTHCARE INDEX",
+      "indexSymbol": "NIFTY HEALTHCARE",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY IT",
+      "indexSymbol": "NIFTY IT",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY MEDIA",
+      "indexSymbol": "NIFTY MEDIA",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY METAL",
+      "indexSymbol": "NIFTY METAL",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY MIDSMALL HEALTHCARE",
+      "indexSymbol": "NIFTY MIDSML HLTH",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY MIDSMALL FINANCIAL SERVICES",
+      "indexSymbol": "NIFTY MS FIN SERV",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY MIDSMALL IT & TELECOM",
+      "indexSymbol": "NIFTY MS IT TELCM",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY OIL & GAS",
+      "indexSymbol": "NIFTY OIL AND GAS",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY PHARMA",
+      "indexSymbol": "NIFTY PHARMA",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY PSU BANK",
+      "indexSymbol": "NIFTY PSU BANK",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY PRIVATE BANK",
+      "indexSymbol": "NIFTY PVT BANK",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY REALTY",
+      "indexSymbol": "NIFTY REALTY",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY500 HEALTHCARE",
+      "indexSymbol": "NIFTY500 HEALTH",
+      "subType": "Sectoral Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY CAPITAL MARKETS",
+      "indexSymbol": "NIFTY CAPITAL MKT",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY COMMODITIES",
+      "indexSymbol": "NIFTY COMMODITIES",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY INDIA CONSUMPTION",
+      "indexSymbol": "NIFTY CONSUMPTION",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY CORE HOUSING",
+      "indexSymbol": "NIFTY COREHOUSING",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY INDIA SELECT 5 CORPORATE GROUPS (MAATR)",
+      "indexSymbol": "NIFTY CORP MAATR",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY CPSE",
+      "indexSymbol": "NIFTY CPSE",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY ENERGY",
+      "indexSymbol": "NIFTY ENERGY",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY EV & NEW AGE AUTOMOTIVE",
+      "indexSymbol": "NIFTY EV",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY HOUSING",
+      "indexSymbol": "NIFTY HOUSING",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY INDIA DEFENCE",
+      "indexSymbol": "NIFTY IND DEFENCE",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY INDIA DIGITAL",
+      "indexSymbol": "NIFTY IND DIGITAL",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY INDIA TOURISM",
+      "indexSymbol": "NIFTY IND TOURISM",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY INDIA MANUFACTURING",
+      "indexSymbol": "NIFTY INDIA MFG",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY INFRASTRUCTURE",
+      "indexSymbol": "NIFTY INFRA",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY INDIA INFRASTRUCTURE & LOGISTICS",
+      "indexSymbol": "NIFTY INFRALOG",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY INDIA INTERNET",
+      "indexSymbol": "NIFTY INTERNET",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY IPO",
+      "indexSymbol": "NIFTY IPO",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY MIDCAP LIQUID 15",
+      "indexSymbol": "NIFTY MID LIQ 15",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY MNC",
+      "indexSymbol": "NIFTY MNC",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY MOBILITY",
+      "indexSymbol": "NIFTY MOBILITY",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY MIDSMALL INDIA CONSUMPTION",
+      "indexSymbol": "NIFTY MS IND CONS",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY500 MULTICAP INFRASTRUCTURE 50:30:20",
+      "indexSymbol": "NIFTY MULTI INFRA",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY500 MULTICAP INDIA MANUFACTURING 50:30:20",
+      "indexSymbol": "NIFTY MULTI MFG",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY INDIA NEW AGE CONSUMPTION",
+      "indexSymbol": "NIFTY NEW CONSUMP",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY NON-CYCLICAL CONSUMER",
+      "indexSymbol": "NIFTY NONCYC CONS",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY PSE",
+      "indexSymbol": "NIFTY PSE",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY RURAL",
+      "indexSymbol": "NIFTY RURAL",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY SERVICES SECTOR",
+      "indexSymbol": "NIFTY SERV SECTOR",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY SHARIAH 25",
+      "indexSymbol": "NIFTY SHARIAH 25",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY SME EMERGE",
+      "indexSymbol": "NIFTY SME EMERGE",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY INDIA CORPORATE GROUP INDEX - TATA GROUP 25% CAP",
+      "indexSymbol": "NIFTY TATA 25 CAP",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY TRANSPORTATION & LOGISTICS",
+      "indexSymbol": "NIFTY TRANS LOGIS",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY WAVES",
+      "indexSymbol": "NIFTY WAVES",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY100 ENHANCED ESG",
+      "indexSymbol": "NIFTY100 ENH ESG",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY100 ESG",
+      "indexSymbol": "NIFTY100 ESG",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY100 LIQUID 15",
+      "indexSymbol": "NIFTY100 LIQ 15",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY50 SHARIAH",
+      "indexSymbol": "NIFTY50 SHARIAH",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY500 SHARIAH",
+      "indexSymbol": "NIFTY500 SHARIAH",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY INDIA CORPORATE GROUP INDEX - ADITYA BIRLA GROUP",
+      "indexSymbol": "NIFTY INDIA CORPORATE GROUP INDEX - ADITYA BIRLA GROUP",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY INDIA CORPORATE GROUP INDEX - MAHINDRA GROUP",
+      "indexSymbol": "NIFTY INDIA CORPORATE GROUP INDEX - MAHINDRA GROUP",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY INDIA RAILWAYS PSU",
+      "indexSymbol": "NIFTY INDIA RAILWAYS PSU",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY REITS & INVITS",
+      "indexSymbol": "NIFTY REITS & INVITS",
+      "subType": "Thematic Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY ALPHA 50",
+      "indexSymbol": "NIFTY ALPHA 50",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY ALPHA LOW-VOLATILITY 30",
+      "indexSymbol": "NIFTY ALPHALOWVOL",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY ALPHA QUALITY LOW-VOLATILITY 30",
+      "indexSymbol": "NIFTY AQL 30",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY ALPHA QUALITY VALUE LOW-VOLATILITY 30",
+      "indexSymbol": "NIFTY AQLV 30",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY DIVIDEND OPPORTUNITIES 50",
+      "indexSymbol": "NIFTY DIV OPPS 50",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY GROWTH SECTORS 15",
+      "indexSymbol": "NIFTY GROWSECT 15",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY HIGH BETA 50",
+      "indexSymbol": "NIFTY HIGHBETA 50",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY LOW VOLATILITY 50",
+      "indexSymbol": "NIFTY LOW VOL 50",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY MIDCAP150 QUALITY 50",
+      "indexSymbol": "NIFTY M150 QLTY50",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY500 MULTICAP MOMENTUM QUALITY 50",
+      "indexSymbol": "NIFTY MULTI MQ 50",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY QUALITY LOW-VOLATILITY 30",
+      "indexSymbol": "NIFTY QLTY LV 30",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY SMALLCAP250 QUALITY 50",
+      "indexSymbol": "NIFTY SML250 Q50",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY TOTAL MARKET MOMENTUM QUALITY 50",
+      "indexSymbol": "NIFTY TMMQ 50",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY TOP 10 EQUAL WEIGHT",
+      "indexSymbol": "NIFTY TOP 10 EW",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY TOP 15 EQUAL WEIGHT",
+      "indexSymbol": "NIFTY TOP 15 EW",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY TOP 20 EQUAL WEIGHT",
+      "indexSymbol": "NIFTY TOP 20 EW",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY100 ALPHA 30",
+      "indexSymbol": "NIFTY100 ALPHA 30",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY100 EQUAL WEIGHT",
+      "indexSymbol": "NIFTY100 EQL WGT",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY100 LOW VOLATILITY 30",
+      "indexSymbol": "NIFTY100 LOWVOL30",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY100 QUALITY 30",
+      "indexSymbol": "NIFTY100 QUALTY30",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY200 ALPHA 30",
+      "indexSymbol": "NIFTY200 ALPHA 30",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY200 QUALITY 30",
+      "indexSymbol": "NIFTY200 QUALTY30",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY200 VALUE 30",
+      "indexSymbol": "NIFTY200 VALUE 30",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY200 MOMENTUM 30",
+      "indexSymbol": "NIFTY200MOMENTM30",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY50 DIVIDEND POINTS",
+      "indexSymbol": "NIFTY50 DIV POINT",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY50 EQUAL WEIGHT",
+      "indexSymbol": "NIFTY50 EQL WGT",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY50 PR 1X INVERSE",
+      "indexSymbol": "NIFTY50 PR 1X INV",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY50 PR 2X LEVERAGE",
+      "indexSymbol": "NIFTY50 PR 2X LEV",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY50 TR 1X INVERSE",
+      "indexSymbol": "NIFTY50 TR 1X INV",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY50 TR 2X LEVERAGE",
+      "indexSymbol": "NIFTY50 TR 2X LEV",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY50 VALUE 20",
+      "indexSymbol": "NIFTY50 VALUE 20",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY500 EQUAL WEIGHT",
+      "indexSymbol": "NIFTY500 EW",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY500 FLEXICAP QUALITY 30",
+      "indexSymbol": "NIFTY500 FLEXICAP",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY500 LOW VOLATILITY 50",
+      "indexSymbol": "NIFTY500 LOWVOL50",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY500 MULTIFACTOR MQVLV 50",
+      "indexSymbol": "NIFTY500 MQVLV50",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY500 QUALITY 50",
+      "indexSymbol": "NIFTY500 QLTY50",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY500 VALUE 50",
+      "indexSymbol": "NIFTY500 VALUE 50",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY500 MOMENTUM 50",
+      "indexSymbol": "NIFTY500MOMENTM50",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY MIDCAP150 MOMENTUM 50",
+      "indexSymbol": "NIFTYM150MOMNTM50",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY MIDSMALLCAP400 MOMENTUM QUALITY 100",
+      "indexSymbol": "NIFTYMS400 MQ 100",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY SMALLCAP250 MOMENTUM QUALITY 100",
+      "indexSymbol": "NIFTYSML250MQ 100",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY 1D RATE INDEX",
+      "indexSymbol": "NIFTY 1D RATE INDEX",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY 50 ARBITRAGE",
+      "indexSymbol": "NIFTY 50 ARBITRAGE",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY 50 FUTURES INDEX",
+      "indexSymbol": "NIFTY 50 FUTURES INDEX",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY 50 FUTURES TR INDEX",
+      "indexSymbol": "NIFTY 50 FUTURES TR INDEX",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY50 USD",
+      "indexSymbol": "NIFTY50 USD",
+      "subType": "Strategy Market Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY BHARAT BOND INDEX - APRIL 2030",
+      "indexSymbol": "BHARATBOND-APR30",
+      "subType": "Fixed Income Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY BHARAT BOND INDEX - APRIL 2031",
+      "indexSymbol": "BHARATBOND-APR31",
+      "subType": "Fixed Income Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY BHARAT BOND INDEX - APRIL 2032",
+      "indexSymbol": "BHARATBOND-APR32",
+      "subType": "Fixed Income Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY BHARAT BOND INDEX - APRIL 2033",
+      "indexSymbol": "BHARATBOND-APR33",
+      "subType": "Fixed Income Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY 10 YR BENCHMARK G-SEC",
+      "indexSymbol": "NIFTY GS 10YR",
+      "subType": "Fixed Income Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY 10 YR BENCHMARK G-SEC (CLEAN PRICE)",
+      "indexSymbol": "NIFTY GS 10YR CLN",
+      "subType": "Fixed Income Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY 11-15 YR G-SEC INDEX",
+      "indexSymbol": "NIFTY GS 11 15YR",
+      "subType": "Fixed Income Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY 15 YR AND ABOVE G-SEC INDEX",
+      "indexSymbol": "NIFTY GS 15YRPLUS",
+      "subType": "Fixed Income Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY 4-8 YR G-SEC INDEX",
+      "indexSymbol": "NIFTY GS 4 8YR",
+      "subType": "Fixed Income Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY 8-13 YR G-SEC",
+      "indexSymbol": "NIFTY GS 8 13YR",
+      "subType": "Fixed Income Indices",
+      "derivativesEligiblity": false
+    },
+    {
+      "indexName": "NIFTY COMPOSITE G-SEC INDEX",
+      "indexSymbol": "NIFTY GS COMPSITE",
+      "subType": "Fixed Income Indices",
+      "derivativesEligiblity": false
+    }
+  ]
+}

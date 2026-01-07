@@ -174,19 +174,32 @@ INDEX_MASTER_URL = "https://www.nseindia.com/api/equity-masterOR"
 # Categories to skip (not actual indices)
 SKIP_CATEGORIES = {"Others"}
 
+# Manual symbol overrides for indices where NSE API returns truncated/wrong symbols
+# that don't work with Nifty Indices API
+SYMBOL_OVERRIDES = {
+    "NIFTY200 QUALITY 30": "NIFTY200 QUALITY 30",  # NSE returns "NIFTY200 QUALTY30" which doesn't work
+}
+
+# Manual subType overrides for indices incorrectly categorized by NSE API
+SUBTYPE_OVERRIDES = {
+    "NIFTY BANK": "Sectoral Market Indices",
+    "NIFTY FINANCIAL SERVICES": "Sectoral Market Indices",
+}
+
 
 def get_index_list() -> dict:
     """
     Get the master list of all indices from NSE India.
     
     This function fetches the index master data and returns a simplified list
-    with index symbol, subType (category), and derivatives eligibility.
+    with index name, symbol, subType (category), and derivatives eligibility.
     
     Returns:
         A dictionary with:
         - indexList: List of index objects with:
-            - indexSymbol: Name of the index
-            - subType: Category (e.g., "Broad Market Indices", "Sectoral Market Indices")
+            - indexName: Full name of the index (e.g., "NIFTY FINANCIAL SERVICES")
+            - indexSymbol: Short symbol used in APIs (e.g., "NIFTY FIN SERVICE")
+            - subType: Category (e.g., "Broad Market Indices", "Sectoral Indices")
             - derivativesEligiblity: True if index is eligible for derivatives trading
         
         Returns empty dict {} if the API call fails.
@@ -195,8 +208,21 @@ def get_index_list() -> dict:
         >>> from niftyterminal import get_index_list
         >>> data = get_index_list()
         >>> print(data['indexList'][0])
-        {'indexSymbol': 'NIFTY 50', 'subType': 'Broad Market Indices', 'derivativesEligiblity': True}
+        {'indexName': 'NIFTY 50', 'indexSymbol': 'NIFTY 50', 'subType': 'Broad Market Indices', 'derivativesEligiblity': True}
     """
+    # Fetch from allIndices API to get indexSymbol mapping
+    all_indices_data = fetch(ALL_INDICES_URL)
+    
+    # Build mapping: indexName -> indexSymbol
+    symbol_map = {}
+    if all_indices_data and "data" in all_indices_data:
+        for item in all_indices_data["data"]:
+            index_name = item.get("index", "")
+            index_symbol = item.get("indexSymbol", "")
+            if index_name and index_symbol:
+                symbol_map[index_name] = index_symbol
+    
+    # Fetch from master API
     data = fetch(INDEX_MASTER_URL)
     
     if not data:
@@ -206,6 +232,7 @@ def get_index_list() -> dict:
     derivatives_list = set(data.get("Indices Eligible in Derivatives", []))
     
     index_list = []
+    seen_indices = set()  # Track to avoid duplicates
     
     # Process each category
     for category, indices in data.items():
@@ -218,40 +245,45 @@ def get_index_list() -> dict:
             # Add these indices with "Broad Market Indices" as subType
             # (they're the major tradeable indices)
             for index_name in indices:
-                index_list.append({
-                    "indexName": index_name,
-                    "subType": "Broad Market Indices",
-                    "derivativesEligiblity": True,
-                })
+                if index_name not in seen_indices:
+                    seen_indices.add(index_name)
+                    # Use override if available, otherwise use symbol_map
+                    resolved_symbol = SYMBOL_OVERRIDES.get(index_name, symbol_map.get(index_name, index_name))
+                    # Use subType override if available
+                    resolved_subtype = SUBTYPE_OVERRIDES.get(index_name, "Broad Market Indices")
+                    index_list.append({
+                        "indexName": index_name,
+                        "indexSymbol": resolved_symbol,
+                        "subType": resolved_subtype,
+                        "derivativesEligiblity": True,
+                    })
             continue
         
         # Process regular categories
         for index_name in indices:
-            index_list.append({
-                "indexName": index_name,
-                "subType": category,
-                "derivativesEligiblity": index_name in derivatives_list,
-            })
+            if index_name not in seen_indices:
+                seen_indices.add(index_name)
+                # Use override if available, otherwise use symbol_map
+                resolved_symbol = SYMBOL_OVERRIDES.get(index_name, symbol_map.get(index_name, index_name))
+                index_list.append({
+                    "indexName": index_name,
+                    "indexSymbol": resolved_symbol,
+                    "subType": category,
+                    "derivativesEligiblity": index_name in derivatives_list,
+                })
     
     return {
         "indexList": index_list,
     }
 
 
-# NSE Index Historical Data API endpoints
-INDEX_HISTORY_URL = "https://www.nseindia.com/api/historicalOR/indicesHistory"
-INDEX_YIELD_URL = "https://www.nseindia.com/api/historicalOR/indicesYield"
-
-# Maximum days per API request (NSE limit is ~365 days)
-MAX_DAYS_PER_REQUEST = 364
-
-
-def _normalize_date(date_str: str) -> str:
+def _normalize_nifty_date(date_str: str) -> str:
     """
-    Normalize date from various formats to YYYY-MM-DD.
+    Normalize date from Nifty Indices API format to YYYY-MM-DD.
     
     Handles:
-    - DD-MMM-YYYY (e.g., "03-JAN-2025") -> "2025-01-03"
+    - DD MMM YYYY (e.g., "03 Jan 2025") -> "2025-01-03"
+    - DD-MMM-YYYY (e.g., "03-Jan-2025") -> "2025-01-03"
     - Already in YYYY-MM-DD -> returns as-is
     """
     from datetime import datetime
@@ -259,9 +291,16 @@ def _normalize_date(date_str: str) -> str:
     if not date_str:
         return ""
     
-    # Try DD-MMM-YYYY format first (API response format)
+    # Try "DD MMM YYYY" format first (Nifty Indices API response format)
     try:
-        dt = datetime.strptime(date_str.upper(), "%d-%b-%Y")
+        dt = datetime.strptime(date_str.strip(), "%d %b %Y")
+        return dt.strftime("%Y-%m-%d")
+    except ValueError:
+        pass
+    
+    # Try "DD-MMM-YYYY" format 
+    try:
+        dt = datetime.strptime(date_str.strip().upper(), "%d-%b-%Y")
         return dt.strftime("%Y-%m-%d")
     except ValueError:
         pass
@@ -282,10 +321,14 @@ def get_index_historical_data(
     end_date: str = None
 ) -> dict:
     """
-    Get historical OHLC and valuation data for an index from NSE India.
+    Get historical OHLC, valuation, and total returns data for an index.
     
-    This function fetches historical price data (OHLC) and valuation metrics
-    (PE, PB, DivYield) from NSE APIs and merges them by date.
+    This function fetches data from Nifty Indices (niftyindices.com) combining:
+    - Historical OHLC data (index_history)
+    - PE, PB, Dividend Yield (index_pe_pb_div)
+    - Total Returns Index (index_total_returns)
+    
+    All three datasets are merged by date into a single output.
     
     Args:
         index_symbol: Name of the index (e.g., "NIFTY 50", "NIFTY BANK")
@@ -295,8 +338,8 @@ def get_index_historical_data(
     
     Returns:
         A dictionary with:
-        - data: List of historical data points with:
-            - indexSymbol: Name of the index
+        - indexData: List of historical data points with:
+            - indexName: Name of the index
             - date: Date in YYYY-MM-DD format
             - open: Opening value
             - high: Highest value
@@ -305,17 +348,19 @@ def get_index_historical_data(
             - PE: Price to Earnings ratio
             - PB: Price to Book ratio
             - divYield: Dividend Yield percentage
+            - totalReturnsIndex: Total Returns Index value
         
         Returns empty dict {} if the API call fails.
         
     Example:
         >>> from niftyterminal import get_index_historical_data
-        >>> data = get_index_historical_data("NIFTY 50", "2025-01-01", "2026-01-03")
-        >>> print(data['data'][0])
-        {'indexSymbol': 'NIFTY 50', 'date': '2026-01-02', 'open': 26155.1, ...}
+        >>> data = get_index_historical_data("NIFTY 50", "2024-01-01", "2024-12-31")
+        >>> print(data['indexData'][0])
+        {'indexName': 'NIFTY 50', 'date': '2024-12-31', 'open': 24150.05, ...}
     """
-    from datetime import datetime, timedelta
-    from urllib.parse import quote
+    from datetime import datetime
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    from niftyterminal.core import NiftyIndicesSession
     
     # Parse dates (YYYY-MM-DD format)
     try:
@@ -335,89 +380,89 @@ def get_index_historical_data(
     if start_dt > end_dt:
         return {}
     
-    # Generate date batches if range > MAX_DAYS_PER_REQUEST
-    date_batches = []
-    current_start = start_dt
+    # Convert to Nifty Indices API date format (DD-Mon-YYYY)
+    nifty_start_date = start_dt.strftime("%d-%b-%Y")
+    nifty_end_date = end_dt.strftime("%d-%b-%Y")
     
-    while current_start < end_dt:
-        current_end = min(current_start + timedelta(days=MAX_DAYS_PER_REQUEST), end_dt)
-        date_batches.append((current_start, current_end))
-        current_start = current_end + timedelta(days=1)
+    # Data containers
+    history_data = {}
+    pe_pb_div_data = {}
+    total_returns_data = {}
     
-    # Fetch price data for each batch
-    price_data = {}  # date -> {open, high, low, close}
-    
-    for batch_start, batch_end in date_batches:
-        # Format dates for API (DD-MM-YYYY)
-        from_date = batch_start.strftime("%d-%m-%Y")
-        to_date = batch_end.strftime("%d-%m-%Y")
-        
-        # Build URL with URL-encoded index symbol
-        url = f"{INDEX_HISTORY_URL}?indexType={quote(index_symbol)}&from={from_date}&to={to_date}"
-        
-        batch_data = fetch(url)
-        
-        if batch_data and "data" in batch_data:
-            for item in batch_data["data"]:
-                raw_date = item.get("EOD_TIMESTAMP", "")
-                normalized_date = _normalize_date(raw_date)
+    # Fetch all three data sources in parallel using NiftyIndicesSession
+    with NiftyIndicesSession() as session:
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            futures = {
+                executor.submit(session.fetch_history, index_symbol, nifty_start_date, nifty_end_date): "history",
+                executor.submit(session.fetch_pe_pb_div, index_symbol, nifty_start_date, nifty_end_date): "pe_pb_div",
+                executor.submit(session.fetch_total_returns, index_symbol, nifty_start_date, nifty_end_date): "total_returns",
+            }
+            
+            for future in as_completed(futures):
+                data_type = futures[future]
+                try:
+                    items = future.result()
+                    
+                    if data_type == "history":
+                        for item in items:
+                            raw_date = item.get("HistoricalDate", "")
+                            normalized_date = _normalize_nifty_date(raw_date)
+                            if normalized_date:
+                                history_data[normalized_date] = {
+                                    "indexName": item.get("INDEX_NAME", index_symbol),
+                                    "open": item.get("OPEN", 0),
+                                    "high": item.get("HIGH", 0),
+                                    "low": item.get("LOW", 0),
+                                    "close": item.get("CLOSE", 0),
+                                }
+                    
+                    elif data_type == "pe_pb_div":
+                        for item in items:
+                            # PE/PB API uses "DATE" field
+                            raw_date = item.get("DATE", "")
+                            normalized_date = _normalize_nifty_date(raw_date)
+                            if normalized_date:
+                                pe_pb_div_data[normalized_date] = {
+                                    "PE": item.get("pe", None),
+                                    "PB": item.get("pb", None),
+                                    "divYield": item.get("divYield", None),
+                                }
+                    
+                    elif data_type == "total_returns":
+                        for item in items:
+                            # Total Returns API uses "Date" field
+                            raw_date = item.get("Date", "")
+                            normalized_date = _normalize_nifty_date(raw_date)
+                            if normalized_date:
+                                total_returns_data[normalized_date] = {
+                                    "totalReturnsIndex": item.get("TotalReturnsIndex", None),
+                                }
                 
-                if normalized_date:
-                    price_data[normalized_date] = {
-                        "indexName": item.get("EOD_INDEX_NAME", ""),
-                        "open": item.get("EOD_OPEN_INDEX_VAL", 0),
-                        "high": item.get("EOD_HIGH_INDEX_VAL", 0),
-                        "low": item.get("EOD_LOW_INDEX_VAL", 0),
-                        "close": item.get("EOD_CLOSE_INDEX_VAL", 0),
-                        "volume": item.get("HIT_TRADED_QTY", 0),
-                    }
+                except Exception:
+                    pass
     
-    # Fetch yield data for each batch
-    yield_data = {}  # date -> {PE, PB, divYield}
-    
-    for batch_start, batch_end in date_batches:
-        # Format dates for API (DD-MM-YYYY)
-        from_date = batch_start.strftime("%d-%m-%Y")
-        to_date = batch_end.strftime("%d-%m-%Y")
-        
-        # Build URL with URL-encoded index symbol
-        url = f"{INDEX_YIELD_URL}?indexType={quote(index_symbol)}&from={from_date}&to={to_date}"
-        
-        batch_data = fetch(url)
-        
-        if batch_data and "data" in batch_data:
-            for item in batch_data["data"]:
-                raw_date = item.get("IY_DT", "")
-                normalized_date = _normalize_date(raw_date)
-                
-                if normalized_date:
-                    yield_data[normalized_date] = {
-                        "PE": item.get("IY_PE", None),
-                        "PB": item.get("IY_PB", None),
-                        "divYield": item.get("IY_DY", None),
-                    }
-    
-    if not price_data:
+    if not history_data:
         return {}
     
-    # Merge price and yield data by date
+    # Merge all data by date
     all_data = []
     
-    for date_key in sorted(price_data.keys(), reverse=True):
-        price = price_data[date_key]
-        yields = yield_data.get(date_key, {})
+    for date_key in sorted(history_data.keys(), reverse=True):
+        history = history_data[date_key]
+        pe_pb = pe_pb_div_data.get(date_key, {})
+        total_ret = total_returns_data.get(date_key, {})
         
         all_data.append({
-            "indexName": price["indexName"],
+            "indexName": history["indexName"],
             "date": date_key,
-            "open": price["open"],
-            "high": price["high"],
-            "low": price["low"],
-            "close": price["close"],
-            "volume": price["volume"],
-            "PE": yields.get("PE"),
-            "PB": yields.get("PB"),
-            "divYield": yields.get("divYield"),
+            "open": history["open"],
+            "high": history["high"],
+            "low": history["low"],
+            "close": history["close"],
+            "PE": pe_pb.get("PE"),
+            "PB": pe_pb.get("PB"),
+            "divYield": pe_pb.get("divYield"),
+            "totalReturnsIndex": total_ret.get("totalReturnsIndex"),
         })
     
     return {
@@ -465,20 +510,7 @@ def get_index_stocks(index_name: str) -> dict:
         - stockList: List of stocks with:
             - symbol: Stock symbol
             - companyName: Full company name
-            - industry: Industry sector
-            - segment: Market segment (e.g., "EQUITY")
-            - listingDate: Date of listing in YYYY-MM-DD format
             - isin: ISIN code
-            - slb_isin: SLB ISIN code
-            - isFNOSec: If eligible for F&O trading
-            - isCASec: If corporate action security
-            - isSLBSec: If eligible for SLB
-            - isDebtSec: If debt security
-            - isSuspended: If trading is suspended
-            - isETFSec: If ETF security
-            - isDelisted: If delisted
-            - isMunicipalBond: If municipal bond
-            - isHybridSymbol: If hybrid symbol
         
         Returns empty dict {} if the API call fails.
         
@@ -524,20 +556,7 @@ def get_index_stocks(index_name: str) -> dict:
         stock_list.append({
             "symbol": meta.get("symbol", ""),
             "companyName": meta.get("companyName", ""),
-            "industry": meta.get("industry", ""),
-            "segment": meta.get("segment", ""),
-            "listingDate": meta.get("listingDate", ""),
             "isin": meta.get("isin", ""),
-            "slb_isin": meta.get("slb_isin", ""),
-            "isFNOSec": meta.get("isFNOSec", False),
-            "isCASec": meta.get("isCASec", False),
-            "isSLBSec": meta.get("isSLBSec", False),
-            "isDebtSec": meta.get("isDebtSec", False),
-            "isSuspended": meta.get("isSuspended", False),
-            "isETFSec": meta.get("isETFSec", False),
-            "isDelisted": meta.get("isDelisted", False),
-            "isMunicipalBond": meta.get("isMunicipalBond", False),
-            "isHybridSymbol": meta.get("isHybridSymbol", False),
         })
     
     return {

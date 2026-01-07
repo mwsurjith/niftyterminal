@@ -1,0 +1,64 @@
+{
+  "indexData": [
+    {
+      "indexName": "Nifty 50",
+      "date": "2026-01-07",
+      "open": "26143.1",
+      "high": "26187.15",
+      "low": "26067.9",
+      "close": "26140.75",
+      "PE": "22.76",
+      "PB": "3.55",
+      "divYield": "1.28",
+      "totalReturnsIndex": "39350.28"
+    },
+    {
+      "indexName": "Nifty 50",
+      "date": "2026-01-06",
+      "open": "26189.7",
+      "high": "26273.95",
+      "low": "26124.75",
+      "close": "26178.70",
+      "PE": "22.79",
+      "PB": "3.56",
+      "divYield": "1.28",
+      "totalReturnsIndex": "39407.42"
+    },
+    {
+      "indexName": "Nifty 50",
+      "date": "2026-01-05",
+      "open": "26333.7",
+      "high": "26373.2",
+      "low": "26210.05",
+      "close": "26250.30",
+      "PE": "22.85",
+      "PB": "3.57",
+      "divYield": "1.28",
+      "totalReturnsIndex": "39515.23"
+    },
+    {
+      "indexName": "Nifty 50",
+      "date": "2026-01-02",
+      "open": "26155.1",
+      "high": "26340",
+      "low": "26118.4",
+      "close": "26328.55",
+      "PE": "22.92",
+      "PB": "3.58",
+      "divYield": "1.28",
+      "totalReturnsIndex": "39632.99"
+    },
+    {
+      "indexName": "Nifty 50",
+      "date": "2026-01-01",
+      "open": "26173.3",
+      "high": "26197.55",
+      "low": "26113.4",
+      "close": "26146.55",
+      "PE": "22.76",
+      "PB": "3.56",
+      "divYield": "1.28",
+      "totalReturnsIndex": "39359.02"
+    }
+  ]
+}

@@ -18,7 +18,7 @@ from niftyterminal.api.indices import (
 )
 from niftyterminal.api.vix import get_vix_historical_data
 from niftyterminal.api.etf import get_all_etfs
-from niftyterminal.api.stocks import get_stocks_list
+from niftyterminal.api.stocks import get_stocks_list, get_stock_details
 from niftyterminal.api.commodity import get_commodity_list, get_commodity_historical_data
 from niftyterminal.exceptions import (
     NiftyTerminalError,
@@ -38,6 +38,7 @@ __all__ = [
     "get_vix_historical_data",
     "get_all_etfs",
     "get_stocks_list",
+    "get_stock_details",
     "get_commodity_list",
     "get_commodity_historical_data",
     # Exceptions

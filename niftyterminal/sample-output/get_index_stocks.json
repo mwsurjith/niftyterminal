@@ -1,0 +1,256 @@
+{
+  "indexName": "NIFTY 50",
+  "date": "2026-01-07",
+  "stockList": [
+    {
+      "symbol": "TITAN",
+      "companyName": "Titan Company Limited",
+      "isin": "INE280A01028"
+    },
+    {
+      "symbol": "HCLTECH",
+      "companyName": "HCL Technologies Limited",
+      "isin": "INE860A01027"
+    },
+    {
+      "symbol": "WIPRO",
+      "companyName": "Wipro Limited",
+      "isin": "INE075A01022"
+    },
+    {
+      "symbol": "TECHM",
+      "companyName": "Tech Mahindra Limited",
+      "isin": "INE669C01036"
+    },
+    {
+      "symbol": "JIOFIN",
+      "companyName": "Jio Financial Services Limited",
+      "isin": "INE758E01017"
+    },
+    {
+      "symbol": "INFY",
+      "companyName": "Infosys Limited",
+      "isin": "INE009A01021"
+    },
+    {
+      "symbol": "BAJAJ-AUTO",
+      "companyName": "Bajaj Auto Limited",
+      "isin": "INE917I01010"
+    },
+    {
+      "symbol": "APOLLOHOSP",
+      "companyName": "Apollo Hospitals Enterprise Limited",
+      "isin": "INE437A01024"
+    },
+    {
+      "symbol": "SUNPHARMA",
+      "companyName": "Sun Pharmaceutical Industries Limited",
+      "isin": "INE044A01036"
+    },
+    {
+      "symbol": "TCS",
+      "companyName": "Tata Consultancy Services Limited",
+      "isin": "INE467B01029"
+    },
+    {
+      "symbol": "JSWSTEEL",
+      "companyName": "JSW Steel Limited",
+      "isin": "INE019A01038"
+    },
+    {
+      "symbol": "ICICIBANK",
+      "companyName": "ICICI Bank Limited",
+      "isin": "INE090A01021"
+    },
+    {
+      "symbol": "COALINDIA",
+      "companyName": "Coal India Limited",
+      "isin": "INE522F01014"
+    },
+    {
+      "symbol": "EICHERMOT",
+      "companyName": "Eicher Motors Limited",
+      "isin": "INE066A01021"
+    },
+    {
+      "symbol": "BEL",
+      "companyName": "Bharat Electronics Limited",
+      "isin": "INE263A01024"
+    },
+    {
+      "symbol": "ADANIENT",
+      "companyName": "Adani Enterprises Limited",
+      "isin": "INE423A01024"
+    },
+    {
+      "symbol": "ETERNAL",
+      "companyName": "ETERNAL LIMITED",
+      "isin": "INE758T01015"
+    },
+    {
+      "symbol": "TRENT",
+      "companyName": "Trent Limited",
+      "isin": "INE849A01020"
+    },
+    {
+      "symbol": "LT",
+      "companyName": "Larsen & Toubro Limited",
+      "isin": "INE018A01030"
+    },
+    {
+      "symbol": "AXISBANK",
+      "companyName": "Axis Bank Limited",
+      "isin": "INE238A01034"
+    },
+    {
+      "symbol": "TATACONSUM",
+      "companyName": "TATA CONSUMER PRODUCTS LIMITED",
+      "isin": "INE192A01025"
+    },
+    {
+      "symbol": "KOTAKBANK",
+      "companyName": "Kotak Mahindra Bank Limited",
+      "isin": "INE237A01028"
+    },
+    {
+      "symbol": "RELIANCE",
+      "companyName": "Reliance Industries Limited",
+      "isin": "INE002A01018"
+    },
+    {
+      "symbol": "ITC",
+      "companyName": "ITC Limited",
+      "isin": "INE154A01025"
+    },
+    {
+      "symbol": "NESTLEIND",
+      "companyName": "Nestle India Limited",
+      "isin": "INE239A01024"
+    },
+    {
+      "symbol": "ULTRACEMCO",
+      "companyName": "UltraTech Cement Limited",
+      "isin": "INE481G01011"
+    },
+    {
+      "symbol": "HINDALCO",
+      "companyName": "Hindalco Industries Limited",
+      "isin": "INE038A01020"
+    },
+    {
+      "symbol": "NTPC",
+      "companyName": "NTPC Limited",
+      "isin": "INE733E01010"
+    },
+    {
+      "symbol": "HDFCLIFE",
+      "companyName": "HDFC Life Insurance Company Limited",
+      "isin": "INE795G01014"
+    },
+    {
+      "symbol": "ADANIPORTS",
+      "companyName": "Adani Ports and Special Economic Zone Limited",
+      "isin": "INE742F01042"
+    },
+    {
+      "symbol": "SHRIRAMFIN",
+      "companyName": "Shriram Finance Limited",
+      "isin": "INE721A01047"
+    },
+    {
+      "symbol": "BAJAJFINSV",
+      "companyName": "Bajaj Finserv Limited",
+      "isin": "INE918I01026"
+    },
+    {
+      "symbol": "BAJFINANCE",
+      "companyName": "Bajaj Finance Limited",
+      "isin": "INE296A01032"
+    },
+    {
+      "symbol": "M&M",
+      "companyName": "Mahindra & Mahindra Limited",
+      "isin": "INE101A01026"
+    },
+    {
+      "symbol": "INDIGO",
+      "companyName": "InterGlobe Aviation Limited",
+      "isin": "INE646L01027"
+    },
+    {
+      "symbol": "DRREDDY",
+      "companyName": "Dr. Reddy's Laboratories Limited",
+      "isin": "INE089A01031"
+    },
+    {
+      "symbol": "BHARTIARTL",
+      "companyName": "Bharti Airtel Limited",
+      "isin": "INE397D01024"
+    },
+    {
+      "symbol": "ONGC",
+      "companyName": "Oil & Natural Gas Corporation Limited",
+      "isin": "INE213A01029"
+    },
+    {
+      "symbol": "SBILIFE",
+      "companyName": "SBI Life Insurance Company Limited",
+      "isin": "INE123W01016"
+    },
+    {
+      "symbol": "SBIN",
+      "companyName": "State Bank of India",
+      "isin": "INE062A01020"
+    },
+    {
+      "symbol": "GRASIM",
+      "companyName": "Grasim Industries Limited",
+      "isin": "INE047A01021"
+    },
+    {
+      "symbol": "HDFCBANK",
+      "companyName": "HDFC Bank Limited",
+      "isin": "INE040A01034"
+    },
+    {
+      "symbol": "ASIANPAINT",
+      "companyName": "Asian Paints Limited",
+      "isin": "INE021A01026"
+    },
+    {
+      "symbol": "TATASTEEL",
+      "companyName": "Tata Steel Limited",
+      "isin": "INE081A01020"
+    },
+    {
+      "symbol": "HINDUNILVR",
+      "companyName": "Hindustan Unilever Limited",
+      "isin": "INE030A01027"
+    },
+    {
+      "symbol": "MAXHEALTH",
+      "companyName": "Max Healthcare Institute Limited",
+      "isin": "INE027H01010"
+    },
+    {
+      "symbol": "POWERGRID",
+      "companyName": "Power Grid Corporation of India Limited",
+      "isin": "INE752E01010"
+    },
+    {
+      "symbol": "TMPV",
+      "companyName": "Tata Motors Passenger Vehicles Limited",
+      "isin": "INE155A01022"
+    },
+    {
+      "symbol": "MARUTI",
+      "companyName": "Maruti Suzuki India Limited",
+      "isin": "INE585B01010"
+    },
+    {
+      "symbol": "CIPLA",
+      "companyName": "Cipla Limited",
+      "isin": "INE059A01026"
+    }
+  ]
+}

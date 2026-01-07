@@ -10,10 +10,10 @@
 
 <p align="center">
   <a href="https://pypi.org/project/niftyterminal/">
-    <img src="https://img.shields.io/pypi/v/niftyterminal?color=blue&label=PyPI" alt="PyPI Version">
+    <img src="https://img.shields.io/badge/PyPI-v0.1.0-blue" alt="PyPI Version">
   </a>
   <a href="https://pypi.org/project/niftyterminal/">
-    <img src="https://img.shields.io/pypi/pyversions/niftyterminal" alt="Python Versions">
+    <img src="https://img.shields.io/badge/Python-3.9%2B-blue" alt="Python Versions">
   </a>
   <a href="https://github.com/mwsurjith/niftyterminal/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
@@ -67,10 +67,12 @@ for row in data['indexData']:
   - [Get Index List](#get_index_list)
   - [Get All Index Quote](#get_all_index_quote)
   - [Get Index Historical Data](#get_index_historical_dataindex_symbol-start_date-end_date)
-  - [Get Index Stocks](#get_index_stocksindex_name)
+  - [Get Index Stocks](#get_index_stocksindex_symbol)
 - [VIX](#get_vix_historical_datastart_date-end_date)
 - [ETFs](#get_all_etfs)
 - [Equities](#get_stocks_list)
+  - [Get Stocks List](#get_stocks_list)
+  - [Get Stock Details](#get_stock_detailssymbol)
 - [Commodities](#commodity-functions)
   - [Get Commodity List](#get_commodity_list)
   - [Get Commodity Historical Data](#get_commodity_historical_datasymbol-start_date-end_date)
@@ -206,7 +208,9 @@ data = get_all_index_quote()
 
 ### `get_index_historical_data(index_symbol, start_date, end_date)`
 
-Get historical OHLC and valuation data (PE, PB, Dividend Yield) for any index.
+Get historical OHLC, valuation data (PE, PB, Dividend Yield), and Total Returns Index for any index.
+
+> **Note:** This function fetches data from Nifty Indices (niftyindices.com), which often provides more complete historical data than NSE India.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -231,16 +235,16 @@ data = get_index_historical_data("NIFTY BANK", "2024-01-01")
 {
   "indexData": [
     {
-      "indexName": "NIFTY 50",
-      "date": "2025-01-10",
-      "open": 23551.9,
-      "high": 23596.6,
-      "low": 23344.35,
-      "close": 23431.5,
-      "volume": 261022434,
-      "PE": 21.59,
-      "PB": 3.49,
-      "divYield": 1.28
+      "indexName": "Nifty 50",
+      "date": "2024-12-05",
+      "open": "24539.15",
+      "high": "24857.75",
+      "low": "24295.55",
+      "close": "24708.40",
+      "PE": "22.74",
+      "PB": "3.68",
+      "divYield": "1.24",
+      "totalReturnsIndex": "36737.18"
     }
   ]
 }
@@ -249,21 +253,21 @@ data = get_index_historical_data("NIFTY BANK", "2024-01-01")
 | Field | Description |
 |-------|-------------|
 | `date` | Trading date in `YYYY-MM-DD` format |
-| `open` / `high` / `low` / `close` | OHLC prices |
-| `volume` | Total traded volume |
+| `open` / `high` / `low` / `close` | OHLC values |
 | `PE` / `PB` / `divYield` | Valuation metrics |
+| `totalReturnsIndex` | Total Returns Index value (includes dividends reinvested) |
 
 </details>
 
 ---
 
-### `get_index_stocks(index_name)`
+### `get_index_stocks(index_symbol)`
 
 Get the list of constituent stocks for an index.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `index_name` | str | ✅ | Index name (e.g., `"NIFTY 50"`, `"NIFTY BANK"`) |
+| `index_symbol` | str | ✅ | Index symbol (e.g., `"NIFTY 50"`, `"NIFTY BANK"`) |
 
 ```python
 from niftyterminal import get_index_stocks
@@ -277,16 +281,12 @@ data = get_index_stocks("NIFTY 50")
 ```json
 {
   "indexName": "NIFTY 50",
-  "date": "2026-01-02",
+  "date": "2026-01-07",
   "stockList": [
     {
-      "symbol": "COALINDIA",
-      "companyName": "Coal India Limited",
-      "industry": "Coal",
-      "listingDate": "2010-11-04",
-      "isin": "INE522F01014",
-      "isFNOSec": true,
-      "isSLBSec": true
+      "symbol": "TITAN",
+      "companyName": "Titan Company Limited",
+      "isin": "INE280A01028"
     }
   ]
 }
@@ -296,8 +296,7 @@ data = get_index_stocks("NIFTY 50")
 |-------|-------------|
 | `symbol` | Stock ticker symbol |
 | `companyName` | Full company name |
-| `industry` | Industry sector |
-| `isFNOSec` | Eligible for F&O trading |
+| `isin` | ISIN code |
 
 </details>
 
@@ -410,9 +409,7 @@ print(f"Total stocks: {len(data['stockList'])}")
       "symbol": "20MICRONS",
       "companyName": "20 Microns Limited",
       "series": "EQ",
-      "listingDate": "2008-10-06",
-      "isin": "INE144J01027",
-      "faceValue": 5
+      "isin": "INE144J01027"
     }
   ]
 }
@@ -423,8 +420,65 @@ print(f"Total stocks: {len(data['stockList'])}")
 | `symbol` | Stock ticker symbol |
 | `companyName` | Full company name |
 | `series` | Trading series: `EQ`, `BE`, `BZ` |
-| `listingDate` | Date of listing (`YYYY-MM-DD`) |
-| `faceValue` | Face value of share |
+| `isin` | ISIN code |
+
+</details>
+
+---
+
+### `get_stock_details(symbol)`
+
+Get detailed information for a specific stock including market cap, sector classification, and trading status.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `symbol` | str | ✅ | Stock ticker symbol (e.g., `"RELIANCE"`, `"TCS"`) |
+
+```python
+from niftyterminal import get_stock_details
+
+data = get_stock_details("20MICRONS")
+print(f"Market Cap: {data['marketCap']}")
+```
+
+<details>
+<summary><b>📤 Output</b></summary>
+
+```json
+{
+  "symbol": "20MICRONS",
+  "companyName": "20 Microns Limited",
+  "series": "EQ",
+  "listingDate": "2008-10-06",
+  "isin": "INE144J01027",
+  "faceValue": 5,
+  "marketCap": 7338886685.96,
+  "secStatus": "Listed",
+  "industry": "Industrial Minerals",
+  "sector": "Metals & Mining",
+  "sectorPe": "11.55",
+  "industryInfo": "Minerals & Mining",
+  "macro": "Commodities",
+  "tradingSegment": "Normal Market",
+  "isFNOSec": false,
+  "isCASec": false,
+  "isSLBSec": false,
+  "isDebtSec": false,
+  "isSuspended": false,
+  "isETFSec": false,
+  "isDelisted": false,
+  "isMunicipalBond": false,
+  "isHybridSymbol": false
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `marketCap` | Total market capitalization |
+| `sector` / `industry` | Sector and industry classification |
+| `macro` | Macro category (e.g., Commodities, Financial Services) |
+| `isFNOSec` | Eligible for F&O trading |
+| `isSLBSec` | Eligible for SLB |
 
 </details>
 
