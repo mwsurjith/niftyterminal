@@ -409,7 +409,6 @@ def get_index_historical_data(
                             normalized_date = _normalize_nifty_date(raw_date)
                             if normalized_date:
                                 history_data[normalized_date] = {
-                                    "indexName": item.get("INDEX_NAME", index_symbol),
                                     "open": item.get("OPEN", 0),
                                     "high": item.get("HIGH", 0),
                                     "low": item.get("LOW", 0),
@@ -453,7 +452,7 @@ def get_index_historical_data(
         total_ret = total_returns_data.get(date_key, {})
         
         all_data.append({
-            "indexName": history["indexName"],
+            "indexSymbol": index_symbol,
             "date": date_key,
             "open": history["open"],
             "high": history["high"],

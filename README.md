@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://pypi.org/project/niftyterminal/">
-    <img src="https://img.shields.io/badge/PyPI-v0.1.0-blue" alt="PyPI Version">
+    <img src="https://img.shields.io/badge/PyPI-v0.2.0-blue" alt="PyPI Version">
   </a>
   <a href="https://pypi.org/project/niftyterminal/">
     <img src="https://img.shields.io/badge/Python-3.9%2B-blue" alt="Python Versions">
@@ -72,7 +72,7 @@ for row in data['indexData']:
 - [ETFs](#get_all_etfs)
 - [Equities](#get_stocks_list)
   - [Get Stocks List](#get_stocks_list)
-  - [Get Stock Details](#get_stock_detailssymbol)
+  - [Get Stock Quote](#get_stock_quotesymbol)
 - [Commodities](#commodity-functions)
   - [Get Commodity List](#get_commodity_list)
   - [Get Commodity Historical Data](#get_commodity_historical_datasymbol-start_date-end_date)
@@ -426,19 +426,19 @@ print(f"Total stocks: {len(data['stockList'])}")
 
 ---
 
-### `get_stock_details(symbol)`
+### `get_stock_quote(symbol)`
 
-Get detailed information for a specific stock including market cap, sector classification, and trading status.
+Get quote and detailed information for a specific stock including current price, market cap, sector classification, and trading status.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `symbol` | str | ✅ | Stock ticker symbol (e.g., `"RELIANCE"`, `"TCS"`) |
 
 ```python
-from niftyterminal import get_stock_details
+from niftyterminal import get_stock_quote
 
-data = get_stock_details("20MICRONS")
-print(f"Market Cap: {data['marketCap']}")
+data = get_stock_quote("20MICRONS")
+print(f"LTP: {data['ltp']}, Change: {data['percentChange']}%")
 ```
 
 <details>
@@ -452,33 +452,37 @@ print(f"Market Cap: {data['marketCap']}")
   "listingDate": "2008-10-06",
   "isin": "INE144J01027",
   "faceValue": 5,
-  "marketCap": 7338886685.96,
+  "marketCap": 7209032358.6,
   "secStatus": "Listed",
   "industry": "Industrial Minerals",
   "sector": "Metals & Mining",
-  "sectorPe": "11.55",
+  "sectorPe": "11.69",
   "industryInfo": "Minerals & Mining",
   "macro": "Commodities",
   "tradingSegment": "Normal Market",
   "isFNOSec": false,
-  "isCASec": false,
   "isSLBSec": false,
-  "isDebtSec": false,
   "isSuspended": false,
   "isETFSec": false,
-  "isDelisted": false,
-  "isMunicipalBond": false,
-  "isHybridSymbol": false
+  "open": 206.9,
+  "high": 209.89,
+  "low": 202.51,
+  "ltp": 204.3,
+  "prevClose": 207.54,
+  "change": -3.24,
+  "percentChange": -1.56,
+  "pe": "11.86"
 }
 ```
 
 | Field | Description |
 |-------|-------------|
+| `ltp` | Last traded price |
+| `change` / `percentChange` | Price change |
+| `pe` | Stock PE ratio |
 | `marketCap` | Total market capitalization |
 | `sector` / `industry` | Sector and industry classification |
-| `macro` | Macro category (e.g., Commodities, Financial Services) |
 | `isFNOSec` | Eligible for F&O trading |
-| `isSLBSec` | Eligible for SLB |
 
 </details>
 

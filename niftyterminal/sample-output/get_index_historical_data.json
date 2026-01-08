@@ -1,7 +1,7 @@
 {
   "indexData": [
     {
-      "indexName": "Nifty 50",
+      "indexSymbol": "NIFTY 50",
       "date": "2026-01-07",
       "open": "26143.1",
       "high": "26187.15",
@@ -13,7 +13,7 @@
       "totalReturnsIndex": "39350.28"
     },
     {
-      "indexName": "Nifty 50",
+      "indexSymbol": "NIFTY 50",
       "date": "2026-01-06",
       "open": "26189.7",
       "high": "26273.95",
@@ -25,7 +25,7 @@
       "totalReturnsIndex": "39407.42"
     },
     {
-      "indexName": "Nifty 50",
+      "indexSymbol": "NIFTY 50",
       "date": "2026-01-05",
       "open": "26333.7",
       "high": "26373.2",
@@ -37,7 +37,7 @@
       "totalReturnsIndex": "39515.23"
     },
     {
-      "indexName": "Nifty 50",
+      "indexSymbol": "NIFTY 50",
       "date": "2026-01-02",
       "open": "26155.1",
       "high": "26340",
@@ -49,7 +49,7 @@
       "totalReturnsIndex": "39632.99"
     },
     {
-      "indexName": "Nifty 50",
+      "indexSymbol": "NIFTY 50",
       "date": "2026-01-01",
       "open": "26173.3",
       "high": "26197.55",

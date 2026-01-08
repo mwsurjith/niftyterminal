@@ -109,12 +109,12 @@ def get_stocks_list() -> dict:
     }
 
 
-def get_stock_details(symbol: str) -> dict:
+def get_stock_quote(symbol: str) -> dict:
     """
-    Get detailed information for a specific stock.
+    Get quote and detailed information for a specific stock.
     
-    This function fetches comprehensive stock data including company info,
-    market cap, sector classification, and trading status from NSE APIs.
+    This function fetches comprehensive stock data including current price,
+    company info, market cap, sector classification, and trading status.
     
     Args:
         symbol: Stock ticker symbol (e.g., "RELIANCE", "TCS", "20MICRONS")
@@ -144,17 +144,25 @@ def get_stock_details(symbol: str) -> dict:
         - isDelisted: If delisted
         - isMunicipalBond: If municipal bond
         - isHybridSymbol: If hybrid symbol
+        - open: Opening price
+        - high: Day high
+        - low: Day low
+        - ltp: Last traded price
+        - prevClose: Previous close
+        - change: Price change
+        - percentChange: Percentage change
+        - pe: Stock PE ratio
         
         Returns empty dict {} if the API call fails.
         
     Example:
-        >>> from niftyterminal import get_stock_details
-        >>> data = get_stock_details("RELIANCE")
-        >>> print(f"Market Cap: {data['marketCap']}")
+        >>> from niftyterminal import get_stock_quote
+        >>> data = get_stock_quote("RELIANCE")
+        >>> print(f"LTP: {data['ltp']}, Change: {data['percentChange']}%")
     """
     from urllib.parse import quote
     
-    # Fetch symbol data (for market cap, listing date, sector info)
+    # Fetch symbol data (for market cap, listing date, sector info, price data)
     symbol_data_url = f"{QUOTE_SYMBOL_DATA_URL}?functionName=getSymbolData&marketType=N&series=EQ&symbol={quote(symbol)}"
     symbol_response = fetch(symbol_data_url)
     
@@ -174,6 +182,7 @@ def get_stock_details(symbol: str) -> dict:
     meta_data = data.get("metaData", {})
     trade_info = data.get("tradeInfo", {})
     sec_info = data.get("secInfo", {})
+    order_book = data.get("orderBook", {})
     
     # Parse boolean flags from metadata response
     def parse_bool(val):
@@ -183,7 +192,7 @@ def get_stock_details(symbol: str) -> dict:
             return val.lower() == "true"
         return False
     
-    # Build result
+    # Build result with existing fields
     result = {
         "symbol": meta_data.get("symbol", symbol),
         "companyName": meta_data.get("companyName", ""),
@@ -224,5 +233,16 @@ def get_stock_details(symbol: str) -> dict:
         result["isMunicipalBond"] = False
         result["isHybridSymbol"] = False
     
+    # Add price/trade fields from metaData
+    result["open"] = meta_data.get("open", 0)
+    result["high"] = meta_data.get("dayHigh", 0)
+    result["low"] = meta_data.get("dayLow", 0)
+    result["ltp"] = order_book.get("lastPrice", meta_data.get("closePrice", 0))
+    result["prevClose"] = meta_data.get("previousClose", 0)
+    result["change"] = meta_data.get("change", 0)
+    result["percentChange"] = meta_data.get("pChange", 0)
+    result["pe"] = sec_info.get("pdSymbolPe", "")
+    
     return result
+
 

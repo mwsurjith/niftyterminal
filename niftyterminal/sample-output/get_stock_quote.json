@@ -5,11 +5,11 @@
   "listingDate": "2008-10-06",
   "isin": "INE144J01027",
   "faceValue": 5,
-  "marketCap": 7338886685.96,
+  "marketCap": 7209032358.6,
   "secStatus": "Listed",
   "industry": "Industrial Minerals",
   "sector": "Metals & Mining",
-  "sectorPe": "11.55",
+  "sectorPe": "11.69",
   "industryInfo": "Minerals & Mining",
   "macro": "Commodities",
   "tradingSegment": "Normal Market",
@@ -21,5 +21,13 @@
   "isETFSec": false,
   "isDelisted": false,
   "isMunicipalBond": false,
-  "isHybridSymbol": false
+  "isHybridSymbol": false,
+  "open": 206.9,
+  "high": 209.89,
+  "low": 202.51,
+  "ltp": 204.3,
+  "prevClose": 207.54,
+  "change": -3.24,
+  "percentChange": -1.56,
+  "pe": "11.86"
 }
