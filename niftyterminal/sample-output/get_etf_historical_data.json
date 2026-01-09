@@ -1,0 +1,256 @@
+{
+  "etfData": [
+    {
+      "symbol": "MONQ50",
+      "date": "2026-01-08",
+      "open": 101.85,
+      "high": 101.85,
+      "low": 99.12,
+      "close": 99.72,
+      "volume": 111339
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2026-01-07",
+      "open": 99.98,
+      "high": 99.98,
+      "low": 99.02,
+      "close": 99.37,
+      "volume": 77708
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2026-01-06",
+      "open": 97.2,
+      "high": 99.24,
+      "low": 97.2,
+      "close": 98.87,
+      "volume": 122692
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2026-01-05",
+      "open": 99.98,
+      "high": 100.0,
+      "low": 97.0,
+      "close": 98.3,
+      "volume": 252357
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2026-01-02",
+      "open": 96.59,
+      "high": 99.77,
+      "low": 96.59,
+      "close": 99.36,
+      "volume": 89981
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2026-01-01",
+      "open": 101.36,
+      "high": 101.36,
+      "low": 98.64,
+      "close": 99.07,
+      "volume": 98085
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-31",
+      "open": 101.68,
+      "high": 101.68,
+      "low": 98.16,
+      "close": 98.89,
+      "volume": 78792
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-30",
+      "open": 99.36,
+      "high": 99.69,
+      "low": 98.11,
+      "close": 99.2,
+      "volume": 67049
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-29",
+      "open": 101.5,
+      "high": 101.5,
+      "low": 98.75,
+      "close": 99.36,
+      "volume": 168990
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-26",
+      "open": 98.77,
+      "high": 99.88,
+      "low": 97.1,
+      "close": 99.03,
+      "volume": 100323
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-24",
+      "open": 99.48,
+      "high": 99.48,
+      "low": 98.52,
+      "close": 98.77,
+      "volume": 73268
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-23",
+      "open": 99.88,
+      "high": 100.62,
+      "low": 98.11,
+      "close": 98.71,
+      "volume": 176566
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-22",
+      "open": 99.68,
+      "high": 100.67,
+      "low": 99.0,
+      "close": 99.59,
+      "volume": 102060
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-19",
+      "open": 100.6,
+      "high": 100.6,
+      "low": 99.01,
+      "close": 99.18,
+      "volume": 61815
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-18",
+      "open": 98.94,
+      "high": 99.3,
+      "low": 97.7,
+      "close": 99.1,
+      "volume": 90483
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-17",
+      "open": 101.86,
+      "high": 101.86,
+      "low": 98.55,
+      "close": 98.81,
+      "volume": 74477
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-16",
+      "open": 99.28,
+      "high": 99.28,
+      "low": 98.5,
+      "close": 98.89,
+      "volume": 84832
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-15",
+      "open": 98.51,
+      "high": 99.98,
+      "low": 98.51,
+      "close": 99.45,
+      "volume": 111458
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-12",
+      "open": 100.49,
+      "high": 100.95,
+      "low": 98.4,
+      "close": 99.66,
+      "volume": 164686
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-11",
+      "open": 100.29,
+      "high": 100.29,
+      "low": 97.11,
+      "close": 98.49,
+      "volume": 247386
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-10",
+      "open": 99.64,
+      "high": 99.7,
+      "low": 99.3,
+      "close": 99.55,
+      "volume": 58788
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-09",
+      "open": 98.38,
+      "high": 99.8,
+      "low": 98.38,
+      "close": 99.34,
+      "volume": 87180
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-08",
+      "open": 102.06,
+      "high": 102.06,
+      "low": 98.23,
+      "close": 99.23,
+      "volume": 121853
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-05",
+      "open": 99.86,
+      "high": 99.86,
+      "low": 98.78,
+      "close": 99.09,
+      "volume": 97552
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-04",
+      "open": 100.0,
+      "high": 100.0,
+      "low": 98.28,
+      "close": 98.8,
+      "volume": 118669
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-03",
+      "open": 100.3,
+      "high": 100.3,
+      "low": 99.0,
+      "close": 99.37,
+      "volume": 98625
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-02",
+      "open": 100.9,
+      "high": 100.9,
+      "low": 99.51,
+      "close": 99.66,
+      "volume": 87200
+    },
+    {
+      "symbol": "MONQ50",
+      "date": "2025-12-01",
+      "open": 100.0,
+      "high": 100.0,
+      "low": 99.12,
+      "close": 99.92,
+      "volume": 176394
+    }
+  ]
+}
