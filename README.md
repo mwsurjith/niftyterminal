@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://pypi.org/project/niftyterminal/">
-    <img src="https://img.shields.io/badge/PyPI-v0.2.0-blue" alt="PyPI Version">
+    <img src="https://img.shields.io/badge/PyPI-v0.2.1-blue" alt="PyPI Version">
   </a>
   <a href="https://pypi.org/project/niftyterminal/">
     <img src="https://img.shields.io/badge/Python-3.9%2B-blue" alt="Python Versions">

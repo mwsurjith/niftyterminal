@@ -5,7 +5,7 @@ This library provides easy-to-use functions to fetch market data from NSE India'
 with built-in session management, cookie warmup, and robust error handling.
 """
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 __author__ = "Surjith"
 
 # Public API exports
