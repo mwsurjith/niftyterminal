@@ -148,37 +148,68 @@ def _fetch_with_session(session: httpx.Client, url: str, timeout: int = 10, para
 
 class AsyncNSESession:
     """
-    A reusable asynchronous NSE session for batch operations.
+    An asynchronous NSE session manager. 
+    By default, uses the shared global client for maximum performance.
     """
     
-    def __init__(self, timeout: int = 10):
+    def __init__(self, timeout: int = 10, use_shared: bool = True):
         self.timeout = timeout
         self.session = None
+        self.use_shared = use_shared
         self._warmed_up = False
     
     async def __aenter__(self):
-        self.session = _create_session(is_async=True)
-        self._warmed_up = await _awarmup_session(self.session, timeout=self.timeout, fast=True)
+        if self.use_shared:
+            self.session = await get_shared_client(self.timeout)
+            self._warmed_up = True # Shared client is already warmed up
+        else:
+            self.session = _create_session(is_async=True)
+            self._warmed_up = await _awarmup_session(self.session, timeout=self.timeout, fast=True)
         return self
     
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        if self.session:
+        if self.session and not self.use_shared:
             await self.session.aclose()
         return False
     
     async def fetch(self, url: str, params: Optional[dict] = None, retries: int = 1) -> dict:
-        """Fetch data using the reusable async session."""
+        """Fetch data using the session."""
         if not self._warmed_up:
-            self._warmed_up = await _awarmup_session(self.session, timeout=self.timeout, fast=True)
+            if self.use_shared:
+                self.session = await get_shared_client(self.timeout)
+                self._warmed_up = True
+            else:
+                self._warmed_up = await _awarmup_session(self.session, timeout=self.timeout, fast=True)
         
         for attempt in range(retries + 1):
-            result = await _afetch_with_session(self.session, url, self.timeout, params)
-            if result:
-                return result
-            
-            if attempt < retries:
-                await asyncio.sleep(random.uniform(0.2, 0.4))
-                self._warmed_up = await _awarmup_session(self.session, timeout=self.timeout, fast=True)
+            try:
+                response = await self.session.get(
+                    url, 
+                    timeout=self.timeout, 
+                    params=params, 
+                    headers={"Referer": NSE_OPTION_CHAIN}
+                )
+                if response.status_code == 200:
+                    try:
+                        return response.json()
+                    except ValueError:
+                        pass
+                
+                if attempt < retries:
+                    if self.use_shared:
+                        await refresh_shared_client(self.timeout)
+                        self.session = await get_shared_client(self.timeout)
+                    else:
+                        await _awarmup_session(self.session, timeout=self.timeout, fast=True)
+                    await asyncio.sleep(random.uniform(0.2, 0.4))
+            except Exception:
+                if attempt < retries:
+                    if self.use_shared:
+                        await refresh_shared_client(self.timeout)
+                        self.session = await get_shared_client(self.timeout)
+                    else:
+                        await _awarmup_session(self.session, timeout=self.timeout, fast=True)
+                    await asyncio.sleep(random.uniform(0.2, 0.4))
         
         return {}
 
@@ -220,29 +251,84 @@ class NSESession:
         return {}
 
 
+# Shared session instance
+_SHARED_ASYNC_CLIENT: Optional[httpx.AsyncClient] = None
+_LAST_WARMUP_TIME: float = 0
+_SESSION_LOCK = asyncio.Lock()
+
+async def get_shared_client(timeout: int = 10) -> httpx.AsyncClient:
+    """
+    Get or create a shared httpx.AsyncClient with automatic warmup.
+    Refreshes session if older than 10 minutes.
+    """
+    global _SHARED_ASYNC_CLIENT, _LAST_WARMUP_TIME
+    
+    async with _SESSION_LOCK:
+        now = time.time()
+        # Refresh if client doesn't exist or is older than 10 minutes (600 seconds)
+        if _SHARED_ASYNC_CLIENT is None or (now - _LAST_WARMUP_TIME) > 600:
+            if _SHARED_ASYNC_CLIENT:
+                try:
+                    await _SHARED_ASYNC_CLIENT.aclose()
+                except Exception:
+                    pass
+            
+            _SHARED_ASYNC_CLIENT = httpx.AsyncClient(
+                headers=HEADERS, 
+                follow_redirects=True,
+                timeout=timeout
+            )
+            await _awarmup_session(_SHARED_ASYNC_CLIENT, timeout=timeout, fast=True)
+            _LAST_WARMUP_TIME = now
+            
+        return _SHARED_ASYNC_CLIENT
+
+async def refresh_shared_client(timeout: int = 10):
+    """Force a session refresh."""
+    global _SHARED_ASYNC_CLIENT, _LAST_WARMUP_TIME
+    async with _SESSION_LOCK:
+        if _SHARED_ASYNC_CLIENT:
+            try:
+                await _SHARED_ASYNC_CLIENT.aclose()
+            except Exception:
+                pass
+        _SHARED_ASYNC_CLIENT = None
+        _LAST_WARMUP_TIME = 0
+    return await get_shared_client(timeout)
+
 async def afetch(url: str, timeout: int = 10, params: Optional[dict] = None, retries: int = 2) -> dict:
     """
-    Asynchronously fetch data from an NSE API endpoint with session warmup.
+    Asynchronously fetch data from an NSE API endpoint using a shared session.
+    Automatically handles session refresh on failure.
     """
     for attempt in range(retries + 1):
-        async with httpx.AsyncClient(headers=HEADERS, follow_redirects=True) as session:
-            try:
-                if not await _awarmup_session(session, timeout=timeout, fast=True):
-                    if attempt < retries:
-                        await asyncio.sleep(random.uniform(0.3, 0.5))
-                        continue
+        try:
+            session = await get_shared_client(timeout)
+            response = await session.get(
+                url, 
+                params=params,
+                timeout=timeout,
+                headers={"Referer": NSE_OPTION_CHAIN}
+            )
+            
+            # NSE sometimes returns 200 but with empty or invalid content if cookies are stale
+            if response.status_code == 200:
+                try:
+                    return response.json()
+                except ValueError:
+                    # Stale session or blocked
+                    pass
+            
+            # If we get here, the request "failed" in a way that suggests session issues
+            if attempt < retries:
+                await refresh_shared_client(timeout)
+                await asyncio.sleep(random.uniform(0.3, 0.5))
                 
-                response = await session.get(
-                    url, 
-                    params=params,
-                    timeout=timeout,
-                    headers={"Referer": NSE_OPTION_CHAIN}
-                )
-                response.raise_for_status()
-                return response.json()
-            except (httpx.HTTPError, ValueError):
-                if attempt < retries:
-                    await asyncio.sleep(random.uniform(0.3, 0.5))
+        except (httpx.HTTPError, Exception):
+            if attempt < retries:
+                await refresh_shared_client(timeout)
+                await asyncio.sleep(random.uniform(0.3, 0.5))
+                
     return {}
 
 
@@ -330,15 +416,31 @@ NIFTY_INDEX_PE_PB_DIV_URL = "https://niftyindices.com/Backpage.aspx/getpepbHisto
 NIFTY_INDEX_TOTAL_RETURNS_URL = "https://niftyindices.com/Backpage.aspx/getTotalReturnIndexString"
 
 
+# Shared NiftyIndices session instance
+_SHARED_NIFTY_INDICES_CLIENT: Optional[httpx.AsyncClient] = None
+_NIFTY_INDICES_LOCK = asyncio.Lock()
+
+async def get_shared_nifty_indices_client(timeout: int = 30) -> httpx.AsyncClient:
+    """Get or create a shared client for Nifty Indices."""
+    global _SHARED_NIFTY_INDICES_CLIENT
+    async with _NIFTY_INDICES_LOCK:
+        if _SHARED_NIFTY_INDICES_CLIENT is None:
+            _SHARED_NIFTY_INDICES_CLIENT = httpx.AsyncClient(
+                headers=NIFTY_INDICES_HEADERS, 
+                timeout=timeout
+            )
+        return _SHARED_NIFTY_INDICES_CLIENT
+
 class NiftyIndicesSession:
     """
     Session for fetching data from Nifty Indices (niftyindices.com).
     """
     
-    def __init__(self, timeout: int = 30):
+    def __init__(self, timeout: int = 30, use_shared: bool = True):
         self.timeout = timeout
         self.session = None
         self.asession = None
+        self.use_shared = use_shared
 
     def __enter__(self):
         self.session = httpx.Client(headers=NIFTY_INDICES_HEADERS, timeout=self.timeout)
@@ -350,11 +452,14 @@ class NiftyIndicesSession:
         return False
 
     async def __aenter__(self):
-        self.asession = httpx.AsyncClient(headers=NIFTY_INDICES_HEADERS, timeout=self.timeout)
+        if self.use_shared:
+            self.asession = await get_shared_nifty_indices_client(self.timeout)
+        else:
+            self.asession = httpx.AsyncClient(headers=NIFTY_INDICES_HEADERS, timeout=self.timeout)
         return self
     
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        if self.asession:
+        if self.asession and not self.use_shared:
             await self.asession.aclose()
         return False
     
