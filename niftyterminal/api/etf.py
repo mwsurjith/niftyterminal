@@ -5,7 +5,7 @@ This module provides functions to fetch ETF-related data from NSE India.
 """
 
 import re
-from niftyterminal.core import fetch
+from niftyterminal.core import afetch
 
 
 # NSE ETF API endpoint
@@ -64,9 +64,6 @@ def _parse_asset(assets: str) -> dict:
     """
     Parse the inconsistent 'assets' field into structured assetType, 
     underlyingAsset, and indexVariant.
-    
-    underlyingAsset for equity indices will match the indexSymbol format 
-    from get_index_list (e.g., "NIFTY 50", "NIFTY BANK").
     """
     if not assets:
         return {
@@ -426,54 +423,22 @@ def _parse_timestamp_to_date(timestamp_str: str) -> str:
     Extract date from timestamp format DD-Mon-YYYY HH:MM:SS to YYYY-MM-DD.
     """
     from datetime import datetime
-    
     if not timestamp_str:
         return ""
-    
     for fmt in ["%d-%b-%Y %H:%M:%S", "%d-%b-%Y %H:%M"]:
         try:
             dt = datetime.strptime(timestamp_str, fmt)
             return dt.strftime("%Y-%m-%d")
         except ValueError:
             continue
-    
     return ""
 
 
-def get_all_etfs() -> dict:
+async def get_all_etfs() -> dict:
     """
     Get list of all ETFs from NSE India with cleaned asset categorization.
-    
-    This function fetches all ETFs and structures the inconsistent 'assets' field
-    into clean categories for easy filtering.
-    
-    Returns:
-        A dictionary with:
-        - date: Trading date in YYYY-MM-DD format
-        - etfs: List of ETF objects with:
-            - symbol: ETF ticker symbol
-            - companyName: Full name of the ETF
-            - segment: Market segment (e.g., "EQUITY")
-            - assetType: Category - "Commodity", "EquityIndex", "DebtIndex", "Liquid", "International"
-            - underlyingAsset: Specific underlying asset (e.g., "GOLD", "NIFTY_50")
-            - indexVariant: Variant - "TRI", "EqualWeight", "Momentum", etc. (null if N/A)
-            - activeSeries: Active trading series
-            - listingDate: Date of listing
-            - isin: ISIN code
-            - slb_isin: SLB ISIN code (if available)
-            - debtSeries: Debt series (null if N/A)
-            - isFNOSec, isCASec, isSLBSec, isDebtSec, isSuspended, isETFSec, 
-              isDelisted, isMunicipalBond, isHybridSymbol: Boolean flags
-        
-        Returns empty dict {} if the API call fails.
-        
-    Example:
-        >>> from niftyterminal import get_all_etfs
-        >>> data = get_all_etfs()
-        >>> # Filter for Gold ETFs
-        >>> gold_etfs = [e for e in data['etfs'] if e['underlyingAsset'] == 'GOLD']
     """
-    data = fetch(ETF_URL)
+    data = await afetch(ETF_URL)
     
     if not data:
         return {}
@@ -489,18 +454,12 @@ def get_all_etfs() -> dict:
     
     for etf in raw_etfs:
         meta = etf.get("meta", {})
-        
         if not meta:
             continue
         
-        # Parse asset info
         asset_info = _parse_asset(etf.get("assets", ""))
-        
-        # Get active series as string
         active_series = meta.get("activeSeries", [])
         active_series_str = active_series[0] if active_series else None
-        
-        # Get debt series
         debt_series = meta.get("debtSeries", [])
         debt_series_str = debt_series[0] if debt_series else None
         
@@ -526,7 +485,6 @@ def get_all_etfs() -> dict:
             "isHybridSymbol": meta.get("isHybridSymbol", False),
         }
         
-        # Add slb_isin only if it exists
         slb_isin = meta.get("slb_isin")
         if slb_isin:
             etf_entry["slb_isin"] = slb_isin
@@ -546,13 +504,10 @@ ETF_HISTORY_URL = "https://www.nseindia.com/api/historicalOR/generateSecurityWis
 def _parse_date_dmy(date_str: str) -> str:
     """
     Convert date from DD-Mon-YYYY format to YYYY-MM-DD.
-    e.g., "08-Jan-2026" -> "2026-01-08"
     """
     from datetime import datetime
-    
     if not date_str:
         return ""
-    
     try:
         dt = datetime.strptime(date_str.strip(), "%d-%b-%Y")
         return dt.strftime("%Y-%m-%d")
@@ -560,39 +515,13 @@ def _parse_date_dmy(date_str: str) -> str:
         return ""
 
 
-def get_etf_historical_data(symbol: str, start_date: str, end_date: str = None) -> dict:
+async def get_etf_historical_data(symbol: str, start_date: str, end_date: str = None) -> dict:
     """
-    Get historical OHLCV data for an ETF.
-    
-    For date ranges exceeding 1 year, data is fetched in batches and stitched together.
-    Uses a single session for all batch requests to improve performance.
-    
-    Args:
-        symbol: ETF symbol (e.g., "MONQ50", "NIFTYBEES", "GOLDBEES")
-        start_date: Start date in YYYY-MM-DD format
-        end_date: End date in YYYY-MM-DD format (defaults to today)
-    
-    Returns:
-        A dictionary with:
-        - etfData: List of price records with:
-            - symbol: ETF symbol
-            - date: Date in YYYY-MM-DD format
-            - open: Opening price
-            - high: Day high price
-            - low: Day low price
-            - close: Closing price
-            - volume: Total traded quantity
-        
-        Returns empty dict {} if the API call fails.
-        
-    Example:
-        >>> from niftyterminal import get_etf_historical_data
-        >>> data = get_etf_historical_data("MONQ50", "2025-12-01", "2026-01-08")
-        >>> print(data['etfData'][0])
-        {'symbol': 'MONQ50', 'date': '2026-01-08', 'open': 88.3, 'high': 88.3, 'low': 85.26, 'close': 85.89, 'volume': 112552}
+    Get historical OHLCV data for an ETF asynchronously.
     """
+    import asyncio
     from datetime import datetime, timedelta
-    from niftyterminal.core.session import NSESession
+    from niftyterminal.core import AsyncNSESession
     
     # Maximum days per API request (NSE limit is ~365 days)
     MAX_DAYS_PER_REQUEST = 364
@@ -615,89 +544,56 @@ def get_etf_historical_data(symbol: str, start_date: str, end_date: str = None) 
     if start_dt > end_dt:
         return {}
     
-    # Generate date batches if range > MAX_DAYS_PER_REQUEST
+    # Generate date batches
     date_batches = []
     current_start = start_dt
-    
     while current_start < end_dt:
         current_end = min(current_start + timedelta(days=MAX_DAYS_PER_REQUEST), end_dt)
         date_batches.append((current_start, current_end))
         current_start = current_end + timedelta(days=1)
     
-    # Fetch data for each batch using single session
-    all_records = {}  # Use dict to deduplicate by date
-    
-    with NSESession() as nse:
+    all_records = {}
+    async with AsyncNSESession() as nse:
+        tasks = []
         for batch_start, batch_end in date_batches:
-            # Format dates for API (DD-MM-YYYY)
             from_date = batch_start.strftime("%d-%m-%Y")
             to_date = batch_end.strftime("%d-%m-%Y")
-            
-            # Build URL
             url = f"{ETF_HISTORY_URL}?from={from_date}&to={to_date}&symbol={symbol}&type=priceVolumeDeliverable&series=ALL"
-            
-            data = nse.fetch(url)
-            
-            if not data:
+            tasks.append(nse.fetch(url))
+        
+        batch_results = await asyncio.gather(*tasks)
+        
+        for batch_data in batch_results:
+            if not batch_data:
                 continue
             
-            raw_data = data.get("data", [])
-            
+            raw_data = batch_data.get("data", [])
             for item in raw_data:
                 # Skip non-EQ series (e.g., BL - Block deals)
                 series = item.get("CH_SERIES", "")
                 if series != "EQ":
                     continue
                 
-                # Parse date
                 parsed_date = _parse_date_dmy(item.get("mTIMESTAMP", ""))
-                
                 if not parsed_date:
                     continue
                 
-                # Extract prices
                 try:
-                    open_price = float(item.get("CH_OPENING_PRICE", 0))
+                    all_records[parsed_date] = {
+                        "symbol": item.get("CH_SYMBOL", symbol),
+                        "date": parsed_date,
+                        "open": float(item.get("CH_OPENING_PRICE", 0)),
+                        "high": float(item.get("CH_TRADE_HIGH_PRICE", 0)),
+                        "low": float(item.get("CH_TRADE_LOW_PRICE", 0)),
+                        "close": float(item.get("CH_CLOSING_PRICE", 0)),
+                        "volume": int(item.get("CH_TOT_TRADED_QTY", 0)),
+                    }
                 except (ValueError, TypeError):
-                    open_price = 0.0
-                
-                try:
-                    high_price = float(item.get("CH_TRADE_HIGH_PRICE", 0))
-                except (ValueError, TypeError):
-                    high_price = 0.0
-                
-                try:
-                    low_price = float(item.get("CH_TRADE_LOW_PRICE", 0))
-                except (ValueError, TypeError):
-                    low_price = 0.0
-                
-                try:
-                    close_price = float(item.get("CH_CLOSING_PRICE", 0))
-                except (ValueError, TypeError):
-                    close_price = 0.0
-                
-                try:
-                    volume = int(item.get("CH_TOT_TRADED_QTY", 0))
-                except (ValueError, TypeError):
-                    volume = 0
-                
-                # Use date as key to avoid duplicates
-                all_records[parsed_date] = {
-                    "symbol": item.get("CH_SYMBOL", symbol),
-                    "date": parsed_date,
-                    "open": open_price,
-                    "high": high_price,
-                    "low": low_price,
-                    "close": close_price,
-                    "volume": volume,
-                }
+                    continue
     
     if not all_records:
         return {}
     
-    # Sort by date descending (most recent first)
-    etf_data = [all_records[d] for d in sorted(all_records.keys(), reverse=True)]
-    
     return {
-        "etfData": etf_data,
+        "etfData": [all_records[d] for d in sorted(all_records.keys(), reverse=True)],
     }

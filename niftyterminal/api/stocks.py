@@ -5,8 +5,9 @@ This module provides functions to fetch stock-related data from NSE India.
 """
 
 import csv
+import httpx
 from io import StringIO
-from niftyterminal.core import fetch
+from niftyterminal.core import afetch
 
 
 # NSE Equity CSV URL
@@ -19,8 +20,6 @@ QUOTE_SYMBOL_DATA_URL = "https://www.nseindia.com/api/NextApi/apiClient/GetQuote
 def _parse_listing_date(date_str: str) -> str:
     """
     Convert date from DD-Mon-YYYY format to YYYY-MM-DD.
-    e.g., "06-OCT-2008" -> "2008-10-06"
-    or "06-Oct-2008 00:00:00" -> "2008-10-06"
     """
     from datetime import datetime
     
@@ -37,47 +36,28 @@ def _parse_listing_date(date_str: str) -> str:
         return ""
 
 
-def _fetch_raw(url: str) -> str:
-    """Fetch raw content from URL."""
-    import requests
-    
+async def _fetch_raw(url: str) -> str:
+    """Fetch raw content from URL asynchronously."""
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     }
     
     try:
-        response = requests.get(url, headers=headers, timeout=10)
-        response.raise_for_status()
-        return response.text
+        async with httpx.AsyncClient(headers=headers, follow_redirects=True) as client:
+            response = await client.get(url, timeout=10)
+            response.raise_for_status()
+            return response.text
     except Exception:
         return ""
 
 
-def get_stocks_list() -> dict:
+async def get_stocks_list() -> dict:
     """
-    Get the complete list of all listed stocks on NSE.
-    
-    This function fetches the official EQUITY_L.csv from NSE archives
-    which contains all listed equity securities.
-    
-    Returns:
-        A dictionary with:
-        - stockList: List of stock objects with:
-            - symbol: Stock ticker symbol
-            - companyName: Full company name
-            - series: Trading series (e.g., "EQ", "BE", "BZ")
-            - isin: ISIN code
-        
-        Returns empty dict {} if the API call fails.
-        
-    Example:
-        >>> from niftyterminal import get_stocks_list
-        >>> data = get_stocks_list()
-        >>> print(f"Total stocks: {len(data['stockList'])}")
+    Get the complete list of all listed stocks on NSE asynchronously.
     """
     # Fetch the CSV content
-    csv_content = _fetch_raw(EQUITY_CSV_URL)
+    csv_content = await _fetch_raw(EQUITY_CSV_URL)
     
     if not csv_content:
         return {}
@@ -109,66 +89,22 @@ def get_stocks_list() -> dict:
     }
 
 
-def get_stock_quote(symbol: str) -> dict:
+async def get_stock_quote(symbol: str) -> dict:
     """
-    Get quote and detailed information for a specific stock.
-    
-    This function fetches comprehensive stock data including current price,
-    company info, market cap, sector classification, and trading status.
-    
-    Args:
-        symbol: Stock ticker symbol (e.g., "RELIANCE", "TCS", "20MICRONS")
-    
-    Returns:
-        A dictionary with:
-        - symbol: Stock ticker symbol
-        - companyName: Full company name
-        - series: Trading series (e.g., "EQ")
-        - listingDate: Date of listing in YYYY-MM-DD format
-        - isin: ISIN code
-        - faceValue: Face value of the stock
-        - marketCap: Total market capitalization
-        - secStatus: Security status (e.g., "Listed")
-        - industry: Basic industry classification
-        - sector: Sector classification
-        - sectorPe: Sector PE ratio
-        - industryInfo: Industry information
-        - macro: Macro category
-        - tradingSegment: Trading segment
-        - isFNOSec: If eligible for F&O trading
-        - isCASec: If corporate action security
-        - isSLBSec: If eligible for SLB
-        - isDebtSec: If debt security
-        - isSuspended: If trading is suspended
-        - isETFSec: If ETF security
-        - isDelisted: If delisted
-        - isMunicipalBond: If municipal bond
-        - isHybridSymbol: If hybrid symbol
-        - open: Opening price
-        - high: Day high
-        - low: Day low
-        - ltp: Last traded price
-        - prevClose: Previous close
-        - change: Price change
-        - percentChange: Percentage change
-        - pe: Stock PE ratio
-        
-        Returns empty dict {} if the API call fails.
-        
-    Example:
-        >>> from niftyterminal import get_stock_quote
-        >>> data = get_stock_quote("RELIANCE")
-        >>> print(f"LTP: {data['ltp']}, Change: {data['percentChange']}%")
+    Get quote and detailed information for a specific stock asynchronously.
     """
+    import asyncio
     from urllib.parse import quote
     
-    # Fetch symbol data (for market cap, listing date, sector info, price data)
+    # URLs
     symbol_data_url = f"{QUOTE_SYMBOL_DATA_URL}?functionName=getSymbolData&marketType=N&series=EQ&symbol={quote(symbol)}"
-    symbol_response = fetch(symbol_data_url)
-    
-    # Fetch metadata (for FNO, SLB, etc. flags)
     meta_data_url = f"{QUOTE_SYMBOL_DATA_URL}?functionName=getMetaData&symbol={quote(symbol)}"
-    meta_response = fetch(meta_data_url)
+    
+    # Fetch both concurrently
+    symbol_response, meta_response = await asyncio.gather(
+        afetch(symbol_data_url),
+        afetch(meta_data_url)
+    )
     
     if not symbol_response:
         return {}
@@ -184,7 +120,7 @@ def get_stock_quote(symbol: str) -> dict:
     sec_info = data.get("secInfo", {})
     order_book = data.get("orderBook", {})
     
-    # Parse boolean flags from metadata response
+    # Parse boolean flags
     def parse_bool(val):
         if isinstance(val, bool):
             return val
@@ -192,7 +128,7 @@ def get_stock_quote(symbol: str) -> dict:
             return val.lower() == "true"
         return False
     
-    # Build result with existing fields
+    # Build result
     result = {
         "symbol": meta_data.get("symbol", symbol),
         "companyName": meta_data.get("companyName", ""),
@@ -210,7 +146,7 @@ def get_stock_quote(symbol: str) -> dict:
         "tradingSegment": sec_info.get("tradingSegment", ""),
     }
     
-    # Add flags from metadata response
+    # Add flags
     if meta_response:
         result["isFNOSec"] = parse_bool(meta_response.get("isFNOSec", False))
         result["isCASec"] = parse_bool(meta_response.get("isCASec", False))
@@ -222,18 +158,12 @@ def get_stock_quote(symbol: str) -> dict:
         result["isMunicipalBond"] = parse_bool(meta_response.get("isMunicipalBond", False))
         result["isHybridSymbol"] = parse_bool(meta_response.get("isHybridSymbol", False))
     else:
-        # Default values if metadata not available
-        result["isFNOSec"] = False
-        result["isCASec"] = False
-        result["isSLBSec"] = False
-        result["isDebtSec"] = False
-        result["isSuspended"] = False
-        result["isETFSec"] = False
-        result["isDelisted"] = False
-        result["isMunicipalBond"] = False
-        result["isHybridSymbol"] = False
+        # Default flags
+        for flag in ["isFNOSec", "isCASec", "isSLBSec", "isDebtSec", "isSuspended", 
+                    "isETFSec", "isDelisted", "isMunicipalBond", "isHybridSymbol"]:
+            result[flag] = False
     
-    # Add price/trade fields from metaData
+    # Price data
     result["open"] = meta_data.get("open", 0)
     result["high"] = meta_data.get("dayHigh", 0)
     result["low"] = meta_data.get("dayLow", 0)
@@ -244,5 +174,4 @@ def get_stock_quote(symbol: str) -> dict:
     result["pe"] = sec_info.get("pdSymbolPe", "")
     
     return result
-
 

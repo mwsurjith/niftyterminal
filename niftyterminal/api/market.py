@@ -5,7 +5,7 @@ This module provides functions to fetch market status information from NSE India
 """
 
 from typing import Literal
-from niftyterminal.core import fetch
+from niftyterminal.core import afetch
 
 # NSE Market Status API endpoint
 MARKET_STATUS_URL = "https://www.nseindia.com/api/marketStatus"
@@ -14,7 +14,7 @@ MARKET_STATUS_URL = "https://www.nseindia.com/api/marketStatus"
 MarketType = Literal["Capital Market", "Currency", "Commodity", "Debt", "currencyfuture"]
 
 
-def get_market_status(market: MarketType = "Capital Market") -> dict:
+async def get_market_status(market: MarketType = "Capital Market") -> dict:
     """
     Get the current market status from NSE India.
     
@@ -38,19 +38,16 @@ def get_market_status(market: MarketType = "Capital Market") -> dict:
         data is not found.
         
     Example:
+        >>> import asyncio
         >>> from niftyterminal import get_market_status
         >>> 
-        >>> # Get Capital Market status (default)
-        >>> status = get_market_status()
-        >>> print(status)
-        {'marketStatus': 'Open', 'marketStatusMessage': 'Normal Market is Open'}
+        >>> async def main():
+        >>>     status = await get_market_status()
+        >>>     print(status)
         >>> 
-        >>> # Get Commodity market status
-        >>> commodity_status = get_market_status("Commodity")
-        >>> print(commodity_status)
-        {'marketStatus': 'Open', 'marketStatusMessage': 'Market is Open'}
+        >>> asyncio.run(main())
     """
-    data = fetch(MARKET_STATUS_URL)
+    data = await afetch(MARKET_STATUS_URL)
     
     if not data:
         return {}
