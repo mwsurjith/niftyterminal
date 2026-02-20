@@ -1,0 +1,324 @@
+{
+  "symbol": "RELIANCE",
+  "company_name": "Reliance Industries Limited",
+  "total_filings": 46,
+  "note": "Sample contains 2 recent XBRL (New) filings and 2 older legacy HTML (Old) filings",
+  "filings": [
+    {
+      "seq_number": "1189821",
+      "from_date": "01-Oct-2024",
+      "to_date": "31-Dec-2024",
+      "nature": "Consolidated",
+      "audited": "Un-Audited",
+      "period": "Quarterly",
+      "relating_to": "Third Quarter",
+      "financial_year": "01-Apr-2024 To 31-Mar-2025",
+      "format": "New",
+      "ind_as": "Ind-AS New",
+      "filing_date": "16-Jan-2025 20:15",
+      "xbrl_url": "https://nsearchives.nseindia.com/corporate/xbrl/INDAS_117297_1348248_16012025081520.xml",
+      "html_url": null,
+      "financial_data": {
+        "general_info": {
+          "symbol": "RELIANCE",
+          "fy_start": "2024-04-01",
+          "fy_end": "2025-03-31",
+          "rounding_unit": "Crores",
+          "reporting_quarter": "Third quarter",
+          "nature": "Consolidated",
+          "audited": "Unaudited",
+          "from_date": "2024-10-01",
+          "to_date": "2024-12-31",
+          "segment_type": "Multi segment"
+        },
+        "financials": {
+          "revenue_from_operations": 2438650000000.0,
+          "other_income": 42140000000.0,
+          "total_income": 2480790000000.0,
+          "cost_of_materials_consumed": 985140000000.0,
+          "purchases_of_stock_in_trade": 594590000000.0,
+          "changes_in_inventories": -50140000000.0,
+          "employee_benefit_expense": 71550000000.0,
+          "finance_costs": 61790000000.0,
+          "depreciation": 131810000000.0,
+          "other_expenses": 399620000000.0,
+          "total_expenses": 2194360000000.0,
+          "profit_before_exceptional_items_and_tax": 286430000000.0,
+          "exceptional_items": 0.0,
+          "profit_before_tax": 286430000000.0,
+          "current_tax": 37230000000.0,
+          "deferred_tax": 31160000000.0,
+          "tax_expense": 68390000000.0,
+          "net_profit_continuing_operations": 218040000000.0,
+          "profit_discontinued_before_tax": 0.0,
+          "profit_discontinued_after_tax": 0.0,
+          "share_of_profit_associates": 1260000000.0,
+          "net_profit": 219300000000.0,
+          "other_comprehensive_income": -19200000000.0,
+          "total_comprehensive_income": 200100000000.0,
+          "profit_attributable_to_owners": 185400000000.0,
+          "profit_attributable_to_nci": 33900000000.0,
+          "comprehensive_income_owners": 165270000000.0,
+          "comprehensive_income_nci": 34830000000.0,
+          "inter_segment_revenue": 310990000000.0
+        },
+        "equity": {
+          "paid_up_capital": 135320000000.0,
+          "face_value": 10.0
+        },
+        "eps": {
+          "basic_continuing": 13.7,
+          "diluted_continuing": 13.7,
+          "basic_discontinued": 0.0,
+          "diluted_discontinued": 0.0,
+          "basic_total": 13.7,
+          "diluted_total": 13.7
+        },
+        "segments": {
+          "Digital Services": {
+            "revenue": 397330000000.0,
+            "profit": 102520000000.0,
+            "assets": 5927580000000.0,
+            "liabilities": 2500210000000.0
+          },
+          "Oil and Gas": {
+            "revenue": 63700000000.0,
+            "profit": 42220000000.0,
+            "assets": 372960000000.0,
+            "liabilities": 81690000000.0
+          },
+          "Oil to Chemicals (O2C)": {
+            "revenue": 1495950000000.0,
+            "profit": 128190000000.0,
+            "assets": 4269540000000.0,
+            "liabilities": 1635630000000.0
+          },
+          "Others": {
+            "revenue": 122360000000.0,
+            "profit": 1140000000.0,
+            "assets": 3142620000000.0,
+            "liabilities": 530360000000.0
+          },
+          "Retail": {
+            "revenue": 903510000000.0,
+            "profit": 53220000000.0,
+            "assets": 2100240000000.0,
+            "liabilities": 841010000000.0
+          }
+        }
+      }
+    },
+    {
+      "seq_number": "1181443",
+      "from_date": "01-Jul-2024",
+      "to_date": "30-Sep-2024",
+      "nature": "Consolidated",
+      "audited": "Un-Audited",
+      "period": "Quarterly",
+      "relating_to": "Second Quarter",
+      "financial_year": "01-Apr-2024 To 31-Mar-2025",
+      "format": "New",
+      "ind_as": "Ind-AS New",
+      "filing_date": "14-Oct-2024 19:32",
+      "xbrl_url": "https://nsearchives.nseindia.com/corporate/xbrl/INDAS_112771_1269085_14102024073244.xml",
+      "html_url": null,
+      "financial_data": {
+        "general_info": {
+          "symbol": "RELIANCE",
+          "fy_start": "2024-04-01",
+          "fy_end": "2025-03-31",
+          "rounding_unit": "Crores",
+          "reporting_quarter": "Half yearly",
+          "nature": "Consolidated",
+          "audited": "Unaudited",
+          "from_date": "2024-07-01",
+          "to_date": "2024-09-30",
+          "segment_type": "Multi segment"
+        },
+        "financials": {
+          "revenue_from_operations": 2354810000000.0,
+          "other_income": 48760000000.0,
+          "total_income": 2403570000000.0,
+          "cost_of_materials_consumed": 1070600000000.0,
+          "purchases_of_stock_in_trade": 528240000000.0,
+          "changes_in_inventories": -69820000000.0,
+          "employee_benefit_expense": 66490000000.0,
+          "finance_costs": 60170000000.0,
+          "depreciation": 128800000000.0,
+          "other_expenses": 368720000000.0,
+          "total_expenses": 2153200000000.0,
+          "profit_before_exceptional_items_and_tax": 250370000000.0,
+          "exceptional_items": 0.0,
+          "profit_before_tax": 250370000000.0,
+          "current_tax": 30590000000.0,
+          "deferred_tax": 28770000000.0,
+          "tax_expense": 59360000000.0,
+          "net_profit_continuing_operations": 191010000000.0,
+          "profit_discontinued_before_tax": 0.0,
+          "profit_discontinued_after_tax": 0.0,
+          "share_of_profit_associates": 2220000000.0,
+          "net_profit": 193230000000.0,
+          "other_comprehensive_income": -15060000000.0,
+          "total_comprehensive_income": 178170000000.0,
+          "profit_attributable_to_owners": 165630000000.0,
+          "profit_attributable_to_nci": 27600000000.0,
+          "comprehensive_income_owners": -13350000000.0,
+          "comprehensive_income_nci": -1710000000.0,
+          "inter_segment_revenue": 297780000000.0
+        },
+        "equity": {
+          "paid_up_capital": 67660000000.0,
+          "face_value": 10.0
+        },
+        "eps": {
+          "basic_continuing": 24.48,
+          "diluted_continuing": 24.48,
+          "basic_discontinued": 0.0,
+          "diluted_discontinued": 0.0,
+          "basic_total": 24.48,
+          "diluted_total": 24.48
+        },
+        "segments": {
+          "Digital Services": {
+            "revenue": 380550000000.0,
+            "profit": 98580000000.0,
+            "assets": 5841630000000.0,
+            "liabilities": 2506950000000.0
+          },
+          "Oil and Gas": {
+            "revenue": 62220000000.0,
+            "profit": 39470000000.0,
+            "assets": 374860000000.0,
+            "liabilities": 93520000000.0
+          },
+          "Oil to Chemicals (O2C)": {
+            "revenue": 1555800000000.0,
+            "profit": 106130000000.0,
+            "assets": 4164720000000.0,
+            "liabilities": 1465300000000.0
+          },
+          "Others": {
+            "revenue": 116230000000.0,
+            "profit": 1750000000.0,
+            "assets": 2665820000000.0,
+            "liabilities": 351660000000.0
+          },
+          "Retail": {
+            "revenue": 763250000000.0,
+            "profit": 44320000000.0,
+            "assets": 2046730000000.0,
+            "liabilities": 810190000000.0
+          }
+        }
+      }
+    },
+    {
+      "seq_number": "1017720",
+      "from_date": "01-Oct-2015",
+      "to_date": "31-Dec-2015",
+      "nature": "Consolidated",
+      "audited": "Un-Audited",
+      "period": "Quarterly",
+      "relating_to": "Third Quarter",
+      "financial_year": "01-Apr-2015 To 31-Mar-2016",
+      "format": "Old",
+      "ind_as": "Ind-AS",
+      "filing_date": "17-Jan-2017 14:44",
+      "xbrl_url": "https://nsearchives.nseindia.com/corporate/xbrl/-",
+      "html_url": "https://nsearchives.nseindia.com/archives/financial_results/financial_res_RELIANCE_1017720.html",
+      "financial_data": {
+        "general_info": {
+          "symbol": "RELIANCE",
+          "company_name": "Reliance Industries Limited",
+          "audited": "Unaudited",
+          "nature": "Consolidated",
+          "reporting_quarter": "Third Quarter",
+          "financial_year": "01-Apr-2015 To 31-Mar-2016",
+          "to_date": "31-Dec-2015",
+          "rounding_unit": "Lakhs"
+        },
+        "financials": {
+          "revenue_from_operations": 7251300.0,
+          "other_operating_income": 0.0,
+          "cost_of_materials_consumed": 3763900.0,
+          "purchases_of_stock_in_trade": 671400.0,
+          "changes_in_inventories": 190600.0,
+          "employee_benefit_expense": 195400.0,
+          "depreciation": 288600.0,
+          "other_expenses": 1305200.0,
+          "total_expenses": 6415100.0,
+          "other_income": 244000.0,
+          "finance_costs": 985700.0,
+          "exceptional_items": 0.0,
+          "profit_before_tax": 985700.0,
+          "tax_expense": 253100.0,
+          "net_profit": 732600.0,
+          "share_of_profit_associates": 724500.0,
+          "profit_attributable_to_nci": 7200.0,
+          "other_comprehensive_income": -44400.0,
+          "total_comprehensive_income": 680100.0
+        },
+        "equity": {
+          "face_value": 10.0,
+          "paid_up_capital": 294700.0
+        },
+        "eps": {},
+        "segments": {}
+      }
+    },
+    {
+      "seq_number": "1017719",
+      "from_date": "01-Oct-2016",
+      "to_date": "31-Dec-2016",
+      "nature": "Consolidated",
+      "audited": "Un-Audited",
+      "period": "Quarterly",
+      "relating_to": "Third Quarter",
+      "financial_year": "01-Apr-2016 To 31-Mar-2017",
+      "format": "Old",
+      "ind_as": "Ind-AS",
+      "filing_date": "17-Jan-2017 13:49",
+      "xbrl_url": "https://nsearchives.nseindia.com/corporate/xbrl/-",
+      "html_url": "https://nsearchives.nseindia.com/archives/financial_results/financial_res_RELIANCE_1017719.html",
+      "financial_data": {
+        "general_info": {
+          "symbol": "RELIANCE",
+          "company_name": "Reliance Industries Limited",
+          "audited": "Unaudited",
+          "nature": "Consolidated",
+          "reporting_quarter": "Third Quarter",
+          "financial_year": "01-Apr-2016 To 31-Mar-2017",
+          "to_date": "31-Dec-2016",
+          "rounding_unit": "Lakhs"
+        },
+        "financials": {
+          "revenue_from_operations": 8418900.0,
+          "other_operating_income": 0.0,
+          "cost_of_materials_consumed": 4677400.0,
+          "purchases_of_stock_in_trade": 1071100.0,
+          "changes_in_inventories": -178000.0,
+          "employee_benefit_expense": 189400.0,
+          "depreciation": 279300.0,
+          "other_expenses": 1503800.0,
+          "total_expenses": 7543000.0,
+          "other_income": 273600.0,
+          "finance_costs": 1028600.0,
+          "exceptional_items": 0.0,
+          "profit_before_tax": 1028600.0,
+          "tax_expense": 271900.0,
+          "net_profit": 756700.0,
+          "share_of_profit_associates": 750600.0,
+          "profit_attributable_to_nci": -1200.0,
+          "other_comprehensive_income": -42100.0,
+          "total_comprehensive_income": 708500.0
+        },
+        "equity": {
+          "face_value": 10.0,
+          "paid_up_capital": 295100.0
+        },
+        "eps": {},
+        "segments": {}
+      }
+    }
+  ]
+}

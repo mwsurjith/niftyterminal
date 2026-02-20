@@ -9,7 +9,7 @@ from niftyterminal.api.indices import (
 )
 from niftyterminal.api.vix import get_vix_historical_data
 from niftyterminal.api.etf import get_all_etfs, get_etf_historical_data
-from niftyterminal.api.stocks import get_stocks_list, get_stock_quote
+from niftyterminal.api.stocks import get_stocks_list, get_stock_quote, get_stock_financials
 from niftyterminal.api.commodity import get_commodity_list, get_commodity_historical_data
 
 __all__ = [
@@ -23,6 +23,7 @@ __all__ = [
     "get_etf_historical_data",
     "get_stocks_list",
     "get_stock_quote",
+    "get_stock_financials",
     "get_commodity_list",
     "get_commodity_historical_data",
 ]

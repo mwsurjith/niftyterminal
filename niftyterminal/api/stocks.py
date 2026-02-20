@@ -1,13 +1,15 @@
 """
 Stocks API functions.
 
-This module provides functions to fetch stock-related data from NSE India.
+This module provides functions to fetch stock-related data from NSE India,
+including stock lists, quotes, and quarterly/annual financial results 
+parsed from NSE's Integrated Filing (iXBRL) pages.
 """
 
 import csv
 import httpx
 from io import StringIO
-from niftyterminal.core import afetch
+from niftyterminal.core import afetch, afetch_raw
 
 
 # NSE Equity CSV URL
@@ -174,4 +176,554 @@ async def get_stock_quote(symbol: str) -> dict:
     result["pe"] = sec_info.get("pdSymbolPe", "")
     
     return result
+
+
+# ---------------------------------------------------------------------------
+# Corporates Financial Results
+# ---------------------------------------------------------------------------
+
+CORPORATES_FINANCIAL_URL = (
+    "https://www.nseindia.com/api/corporates-financial-results"
+)
+
+
+def _parse_number(value_str: str):
+    """
+    Convert a number string to a float.
+
+    Handles:
+      - Commas: "29,26,400.00" → 2926400.0
+      - Parenthesized negatives: "(2,68,600.00)" → -268600.0
+      - Scientific notation: "1.92388E7" → 19238800.0
+      - Dashes: "-" → None
+      - Empty / null → None
+    """
+    if not value_str:
+        return None
+
+    s = value_str.strip()
+    if not s or s.lower() == "null" or s == "-":
+        return None
+
+    negative = False
+    if s.startswith("(") and s.endswith(")"):
+        negative = True
+        s = s[1:-1]
+
+    s = s.replace(",", "").replace("\xa0", "").strip()
+    if not s:
+        return None
+
+    try:
+        val = float(s)
+        return -val if negative else val
+    except ValueError:
+        return None
+
+
+def _has_valid_xbrl(filing: dict) -> bool:
+    """Check if a filing has a valid XBRL URL (not the placeholder '-' URL)."""
+    xbrl = filing.get("xbrl", "")
+    return bool(xbrl) and not xbrl.endswith("/-") and not xbrl.endswith("/-\"")
+
+
+def _parse_xbrl_xml(xml_text: str) -> dict:
+    """
+    Parse an XBRL XML file into a structured financial results dict.
+
+    The XML uses `in-bse-fin:` namespace tags like:
+      <in-bse-fin:RevenueFromOperations contextRef="OneD" unitRef="INR">
+    """
+    from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
+    import warnings
+    warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+
+    soup = BeautifulSoup(xml_text, "html.parser")
+
+    def _get_val(tag_name: str):
+        """Get float value from a simple (non-segment) XBRL tag."""
+        # Look for tags with contextRef="OneD" or "OneI" (the main period)
+        for tag in soup.find_all(tag_name.lower()):
+            ctx = tag.get("contextref", "")
+            if ctx in ("OneD", "OneI"):
+                return _parse_number(tag.get_text(strip=True))
+        return None
+
+    def _get_text(tag_name: str) -> str:
+        """Get text value from a simple XBRL tag."""
+        for tag in soup.find_all(tag_name.lower()):
+            ctx = tag.get("contextref", "")
+            if ctx in ("OneD", "OneI"):
+                return tag.get_text(strip=True)
+        return ""
+
+    # --- General Info ---
+    general_info = {
+        "symbol": _get_text("in-bse-fin:symbol"),
+        "fy_start": _get_text("in-bse-fin:dateofstartoffinancialyear"),
+        "fy_end": _get_text("in-bse-fin:dateofendoffinancialyear"),
+        "rounding_unit": _get_text("in-bse-fin:levelofroundingusedinfinancialstatements"),
+        "reporting_quarter": _get_text("in-bse-fin:reportingquarter"),
+        "nature": _get_text("in-bse-fin:natureofreportstandaloneconsolidated"),
+        "audited": _get_text("in-bse-fin:whetherresultsareauditedorunaudited"),
+        "from_date": _get_text("in-bse-fin:dateofstartofreportingperiod"),
+        "to_date": _get_text("in-bse-fin:dateofendofreportingperiod"),
+        "segment_type": _get_text("in-bse-fin:iscompanyreportingmultisegmentorsinglesegment"),
+    }
+
+    # --- Main Financials ---
+    financials = {
+        "revenue_from_operations": _get_val("in-bse-fin:revenuefromoperations"),
+        "other_income": _get_val("in-bse-fin:otherincome"),
+        "total_income": _get_val("in-bse-fin:income"),
+        "cost_of_materials_consumed": _get_val("in-bse-fin:costofmaterialsconsumed"),
+        "purchases_of_stock_in_trade": _get_val("in-bse-fin:purchasesofstockintrade"),
+        "changes_in_inventories": _get_val("in-bse-fin:changesininventoriesoffinishedgoodsworkinprogressandstockintrade"),
+        "employee_benefit_expense": _get_val("in-bse-fin:employeebenefitexpense"),
+        "finance_costs": _get_val("in-bse-fin:financecosts"),
+        "depreciation": _get_val("in-bse-fin:depreciationdepletionandamortisationexpense"),
+        "other_expenses": _get_val("in-bse-fin:otherexpenses"),
+        "total_expenses": _get_val("in-bse-fin:expenses"),
+        "profit_before_exceptional_items_and_tax": _get_val("in-bse-fin:profitbeforeexceptionalitemsandtax"),
+        "exceptional_items": _get_val("in-bse-fin:exceptionalitemsbeforetax"),
+        "profit_before_tax": _get_val("in-bse-fin:profitbeforetax"),
+        "current_tax": _get_val("in-bse-fin:currenttax"),
+        "deferred_tax": _get_val("in-bse-fin:deferredtax"),
+        "tax_expense": _get_val("in-bse-fin:taxexpense"),
+        "net_profit_continuing_operations": _get_val("in-bse-fin:profitlossforperiodfromcontinuingoperations"),
+        "profit_discontinued_before_tax": _get_val("in-bse-fin:profitlossfromdiscontinuedoperationsbeforetax"),
+        "profit_discontinued_after_tax": _get_val("in-bse-fin:profitlossfromdiscontinuedoperationsaftertax"),
+        "share_of_profit_associates": _get_val("in-bse-fin:shareofprofitlossofassociatesandjointventuresaccountedforusingequitymethod"),
+        "net_profit": _get_val("in-bse-fin:profitlossforperiod"),
+        "other_comprehensive_income": _get_val("in-bse-fin:othercomprehensiveincomenetoftaxes"),
+        "total_comprehensive_income": _get_val("in-bse-fin:comprehensiveincomefortheperiod"),
+        "profit_attributable_to_owners": _get_val("in-bse-fin:profitorlossattributabletoownersofparent"),
+        "profit_attributable_to_nci": _get_val("in-bse-fin:profitorlossattributabletononcontrollinginterests"),
+        "comprehensive_income_owners": _get_val("in-bse-fin:comprehensiveincomefortheperiodattributabletoownersofparent"),
+        "comprehensive_income_nci": _get_val("in-bse-fin:comprehensiveincomefortheperiodattributabletoownersofparentnoncontrollinginterests"),
+    }
+
+    # --- Equity ---
+    equity = {
+        "paid_up_capital": _get_val("in-bse-fin:paidupvalueofequitysharecapital"),
+        "face_value": _get_val("in-bse-fin:facevalueofequitysharecapital"),
+    }
+
+    # --- EPS ---
+    eps = {
+        "basic_continuing": _get_val("in-bse-fin:basicearningslossperSharefromcontinuingoperations"),
+        "diluted_continuing": _get_val("in-bse-fin:dilutedearningslossperSharefromcontinuingoperations"),
+        "basic_discontinued": _get_val("in-bse-fin:basicearningslosspersharefromdiscontinuedoperations"),
+        "diluted_discontinued": _get_val("in-bse-fin:dilutedearningslosspersharefromdiscontinuedoperations"),
+        "basic_total": _get_val("in-bse-fin:basicearningslosspersharefromcontinuinganddiscontinuedoperations"),
+        "diluted_total": _get_val("in-bse-fin:dilutedearningslosspersharefromcontinuinganddiscontinuedoperations"),
+    }
+
+    # --- Segments ---
+    segments = {}
+
+    # Segment Revenue (tags: DescriptionOfReportableSegment + SegmentRevenue)
+    revenue_tags = soup.find_all("in-bse-fin:segmentrevenue")
+    for tag in revenue_tags:
+        ctx = tag.get("contextref", "")
+        if not ctx.startswith("OneReportableSegmentRevenue"):
+            continue
+        # Find the matching description
+        desc_tags = soup.find_all("in-bse-fin:descriptionofreportablesegment")
+        for d in desc_tags:
+            if d.get("contextref") == ctx:
+                name = d.get_text(strip=True)
+                if name not in segments:
+                    segments[name] = {}
+                segments[name]["revenue"] = _parse_number(tag.get_text(strip=True))
+                break
+
+    # Segment Profit/Loss
+    profit_tags = soup.find_all("in-bse-fin:segmentprofitlossbeforetaxandfinancecosts")
+    for tag in profit_tags:
+        ctx = tag.get("contextref", "")
+        if not ctx.startswith("OneReportableSegmentResults"):
+            continue
+        desc_tags = soup.find_all("in-bse-fin:descriptionofreportablesegment")
+        for d in desc_tags:
+            if d.get("contextref") == ctx:
+                name = d.get_text(strip=True)
+                if name not in segments:
+                    segments[name] = {}
+                segments[name]["profit"] = _parse_number(tag.get_text(strip=True))
+                break
+
+    # Segment Assets
+    asset_tags = soup.find_all("in-bse-fin:segmentassets")
+    for tag in asset_tags:
+        ctx = tag.get("contextref", "")
+        if not ctx.startswith("OneReportableSegmentAssets"):
+            continue
+        desc_tags = soup.find_all("in-bse-fin:descriptionofreportablesegment")
+        for d in desc_tags:
+            if d.get("contextref") == ctx:
+                name = d.get_text(strip=True)
+                if name not in segments:
+                    segments[name] = {}
+                segments[name]["assets"] = _parse_number(tag.get_text(strip=True))
+                break
+
+    # Segment Liabilities (note: contextRef uses "I" suffix for instant)
+    liability_tags = soup.find_all("in-bse-fin:segmentliabilities")
+    for tag in liability_tags:
+        ctx = tag.get("contextref", "")
+        if "ReportableSegmentLiabilities" not in ctx:
+            continue
+        # Match description using the "D" version of the context
+        d_ctx = ctx.replace("I", "D") if ctx.endswith("I") else ctx
+        desc_tags = soup.find_all("in-bse-fin:descriptionofreportablesegment")
+        for d in desc_tags:
+            if d.get("contextref") == d_ctx:
+                name = d.get_text(strip=True)
+                if name not in segments:
+                    segments[name] = {}
+                segments[name]["liabilities"] = _parse_number(tag.get_text(strip=True))
+                break
+
+    # Inter-segment revenue
+    inter_seg = _get_val("in-bse-fin:intersegmentrevenue")
+    if inter_seg is not None:
+        financials["inter_segment_revenue"] = inter_seg
+
+    return {
+        "general_info": general_info,
+        "financials": financials,
+        "equity": equity,
+        "eps": eps,
+        "segments": segments,
+    }
+
+
+def _parse_legacy_html(html: str) -> dict:
+    """
+    Parse a legacy NSE financial results HTML page (pre-2018 format).
+
+    These pages have a simple two-column table: Description | Amount (Rs. in lakhs)
+    and optionally a Segment Reporting table.
+    """
+    from bs4 import BeautifulSoup
+    import re as _re
+
+    # Handle MHTML: extract HTML portion if needed
+    if html.strip().startswith("From:") or "MultipartBoundary" in html[:500]:
+        match = _re.search(
+            r'Content-Location:.*?\.html\r?\n\r?\n(.*?)(?:------MultipartBoundary|$)',
+            html, _re.DOTALL
+        )
+        if match:
+            raw = match.group(1)
+            import quopri
+            html = quopri.decodestring(raw.encode("utf-8", errors="replace")).decode("utf-8", errors="replace")
+
+    soup = BeautifulSoup(html, "html.parser")
+
+    # --- Parse the header table for general info ---
+    general_info = {}
+    header_table = soup.find("table", class_="table")
+    if header_table:
+        for tr in header_table.find_all("tr"):
+            cells = tr.find_all("td")
+            i = 0
+            while i < len(cells) - 1:
+                label = cells[i].get_text(strip=True).lower()
+                value = cells[i + 1].get_text(strip=True)
+                if "symbol" in label and "symbol" not in general_info:
+                    general_info["symbol"] = value
+                elif "company" in label:
+                    general_info["company_name"] = value
+                elif "audited" in label:
+                    general_info["audited"] = value
+                elif "consolidated" in label:
+                    general_info["nature"] = value
+                elif "period ended" in label:
+                    general_info["to_date"] = value
+                elif "financial year" in label:
+                    general_info["financial_year"] = value
+                elif "relating to" in label:
+                    general_info["reporting_quarter"] = value
+                i += 2
+
+    general_info["rounding_unit"] = "Lakhs"  # Legacy format is always in Lakhs
+
+    # --- Parse all tables ---
+    tables = soup.find_all("table", class_="table")
+
+    financials = {}
+    equity = {}
+    eps = {}
+    segments = {}
+
+    # Key mappings for the main financial table
+    financial_key_map = {
+        "net sales/income from operations": "revenue_from_operations",
+        "other operating income": "other_operating_income",
+        "total income from operations": "revenue_from_operations",
+        "other income": "other_income",
+        "total income": "total_income",
+        "cost of materials consumed": "cost_of_materials_consumed",
+        "purchases of stock-in-trade": "purchases_of_stock_in_trade",
+        "purchases of stock in trade": "purchases_of_stock_in_trade",
+        "changes in inventories": "changes_in_inventories",
+        "employee benefits expense": "employee_benefit_expense",
+        "employee benefit expense": "employee_benefit_expense",
+        "depreciation and amortisation": "depreciation",
+        "depreciation": "depreciation",
+        "finance costs": "finance_costs",
+        "other expenses": "other_expenses",
+        "total expenses": "total_expenses",
+        "profit / (loss) from before exceptional": "profit_before_exceptional_items_and_tax",
+        "exceptional items": "exceptional_items",
+        "profit / (loss) from ordinary activities before tax": "profit_before_tax",
+        "profit before tax": "profit_before_tax",
+        "tax expense": "tax_expense",
+        "profit (loss) for the period from continuing operations": "net_profit_continuing_operations",
+        "profit/(loss) from discontinued operations": "profit_discontinued_before_tax",
+        "profit/(loss) from discontinued operations (after tax)": "profit_discontinued_after_tax",
+        "net profit / (loss) for the period": "net_profit",
+        "net profit/(loss) for the period": "net_profit",
+        "consolidated net profit/loss": "net_profit",
+        "share of profit / (loss) of associates": "share_of_profit_associates",
+        "minority interest": "profit_attributable_to_nci",
+        "other comprehensive income": "other_comprehensive_income",
+        "total comprehensive income": "total_comprehensive_income",
+    }
+
+    eps_key_map = {
+        "basic eps  for continuing operations": "basic_continuing",
+        "basic eps for continuing operations": "basic_continuing",
+        "diluted eps  for continuing operations": "diluted_continuing",
+        "diluted eps for continuing operations": "diluted_continuing",
+        "basic eps  for discontinued operations": "basic_discontinued",
+        "basic eps for discontinued operations": "basic_discontinued",
+        "diluted eps  for discontinued operations": "diluted_discontinued",
+        "diluted eps for discontinued operations": "diluted_discontinued",
+        "basic eps  for continued and discontinued": "basic_total",
+        "basic eps for continued and discontinued": "basic_total",
+        "diluted eps for continued and discontinued": "diluted_total",
+        "diluted eps  for continued and discontinued": "diluted_total",
+    }
+
+    for table in tables:
+        rows = table.find_all("tr")
+        # Detect if this is the segment table
+        header_text = table.get_text(strip=True).lower()
+        is_segment = "segment" in header_text and "revenue" in header_text
+
+        if is_segment:
+            # Parse segment reporting table
+            current_section = None  # revenue, results, assets, liabilities
+            for tr in rows:
+                cells = tr.find_all("td")
+                text = tr.get_text(strip=True).lower()
+
+                if "segment revenue" in text and len(cells) <= 2:
+                    current_section = "revenue"
+                    continue
+                elif "segment results" in text and len(cells) <= 2:
+                    current_section = "profit"
+                    continue
+                elif "segment assets" in text and len(cells) <= 2:
+                    current_section = "assets"
+                    continue
+                elif "segment liabilit" in text and len(cells) <= 2:
+                    current_section = "liabilities"
+                    continue
+
+                if len(cells) == 2 and current_section:
+                    label = cells[0].get_text(strip=True)
+                    value = _parse_number(cells[1].get_text(strip=True))
+
+                    # Skip totals and inter-segment lines
+                    low = label.lower()
+                    if any(skip in low for skip in [
+                        "total", "inter segment", "less:", "net sales",
+                        "interest", "un-allocable", "unallocable"
+                    ]):
+                        continue
+
+                    if label and current_section and value is not None:
+                        if label not in segments:
+                            segments[label] = {}
+                        segments[label][current_section] = value
+        else:
+            # Parse financial results table
+            for tr in rows:
+                cells = tr.find_all("td")
+                if len(cells) < 2:
+                    continue
+
+                label = cells[0].get_text(strip=True).lower()
+                val_text = cells[-1].get_text(strip=True)
+
+                # Skip section headers (Part I, Expenses, etc.)
+                if len(cells) == 1 or not val_text:
+                    continue
+
+                # Try financial keys
+                for pattern, key in financial_key_map.items():
+                    if pattern in label:
+                        val = _parse_number(val_text)
+                        if val is not None:
+                            financials[key] = val
+                        break
+
+                # Try EPS keys
+                for pattern, key in eps_key_map.items():
+                    if pattern in label:
+                        eps[key] = _parse_number(val_text)
+                        break
+
+                # Equity
+                if "paid-up equity share capital" in label or "paid up equity" in label:
+                    equity["paid_up_capital"] = _parse_number(val_text)
+                elif "face value" in label:
+                    equity["face_value"] = _parse_number(val_text)
+
+    return {
+        "general_info": general_info,
+        "financials": financials,
+        "equity": equity,
+        "eps": eps,
+        "segments": segments,
+    }
+
+
+async def _fetch_financial_detail(filing: dict) -> dict:
+    """
+    Fetch and parse financial detail for a single filing.
+
+    Tries XBRL XML first (if valid URL), then falls back to
+    resultDetailedDataLink HTML.
+    """
+    # Try XBRL XML first
+    if _has_valid_xbrl(filing):
+        xbrl_url = filing["xbrl"]
+        xml_text = await afetch_raw(xbrl_url, timeout=15)
+        if xml_text:
+            return _parse_xbrl_xml(xml_text)
+
+    # Fall back to legacy HTML
+    html_url = filing.get("resultDetailedDataLink")
+    if html_url:
+        html = await afetch_raw(html_url, timeout=15)
+        if html:
+            return _parse_legacy_html(html)
+
+    return {}
+
+
+async def get_stock_financials(symbol: str, consolidated: bool = None) -> dict:
+    """
+    Get quarterly/annual financial results for a stock.
+
+    Fetches filing metadata from NSE's Corporates Financial Results API,
+    then downloads and parses each financial report (XBRL XML for recent
+    filings, legacy HTML for older ones).
+
+    Args:
+        symbol: NSE stock symbol (e.g. "RELIANCE", "HINDALCO").
+        consolidated:
+            None  → fetch both standalone and consolidated filings (default)
+            True  → fetch only consolidated filings
+            False → fetch only standalone filings
+
+    Returns:
+        {
+            "symbol": "RELIANCE",
+            "company_name": "Reliance Industries Limited",
+            "total_filings": 100,
+            "filings": [
+                {
+                    "from_date": "01-Oct-2024",
+                    "to_date": "31-Dec-2024",
+                    "nature": "Non-Consolidated",
+                    "audited": "Un-Audited",
+                    "period": "Quarterly",
+                    "relating_to": "Third Quarter",
+                    "financial_year": "01-Apr-2024 To 31-Mar-2025",
+                    "format": "New",
+                    "financial_data": {
+                        "general_info": { ... },
+                        "financials": { ... },
+                        "equity": { ... },
+                        "eps": { ... },
+                        "segments": { ... },
+                    }
+                },
+                ...
+            ]
+        }
+    """
+    import asyncio
+    from urllib.parse import quote
+
+    # Fetch the filing list — issuer is derived from symbol via the API
+    url = (
+        f"{CORPORATES_FINANCIAL_URL}"
+        f"?index=equities"
+        f"&symbol={quote(symbol)}"
+        f"&period=Quarterly"
+    )
+
+    response = await afetch(url, timeout=15)
+
+    if not response:
+        return {}
+
+    # The API returns a list directly (not wrapped in a "data" key)
+    filings_raw = response if isinstance(response, list) else response.get("data", [])
+
+    if not filings_raw:
+        return {}
+
+    # Filter by consolidated/standalone
+    if consolidated is True:
+        filings_raw = [f for f in filings_raw if f.get("consolidated") == "Consolidated"]
+    elif consolidated is False:
+        filings_raw = [
+            f for f in filings_raw
+            if f.get("consolidated") in ("Non-Consolidated", "Standalone")
+        ]
+
+    if not filings_raw:
+        return {}
+
+    company_name = filings_raw[0].get("companyName", "")
+
+    # Fetch & parse all filings concurrently
+    async def _process_filing(filing: dict) -> dict:
+        financial_data = await _fetch_financial_detail(filing)
+
+        return {
+            "seq_number": filing.get("seqNumber"),
+            "from_date": filing.get("fromDate", ""),
+            "to_date": filing.get("toDate", ""),
+            "nature": filing.get("consolidated", ""),
+            "audited": filing.get("audited", ""),
+            "period": filing.get("period", ""),
+            "relating_to": filing.get("relatingTo", ""),
+            "financial_year": filing.get("financialYear", ""),
+            "format": filing.get("format", ""),
+            "ind_as": filing.get("indAs", ""),
+            "filing_date": filing.get("filingDate", ""),
+            "xbrl_url": filing.get("xbrl", ""),
+            "html_url": filing.get("resultDetailedDataLink", ""),
+            "financial_data": financial_data,
+        }
+
+    tasks = [_process_filing(f) for f in filings_raw]
+    filings = await asyncio.gather(*tasks)
+
+    return {
+        "symbol": symbol,
+        "company_name": company_name,
+        "total_filings": len(filings),
+        "filings": list(filings),
+    }
+
 
