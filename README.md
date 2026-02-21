@@ -73,6 +73,7 @@ for row in data['indexData']:
 - [Equities](#get_stocks_list)
   - [Get Stocks List](#get_stocks_list)
   - [Get Stock Quote](#get_stock_quotesymbol)
+  - [Get Stock Financials](#get_stock_financialssymbol-consolidated)
 - [Commodities](#commodity-functions)
   - [Get Commodity List](#get_commodity_list)
   - [Get Commodity Historical Data](#get_commodity_historical_datasymbol-start_date-end_date)
@@ -483,6 +484,73 @@ print(f"LTP: {data['ltp']}, Change: {data['percentChange']}%")
 | `marketCap` | Total market capitalization |
 | `sector` / `industry` | Sector and industry classification |
 | `isFNOSec` | Eligible for F&O trading |
+
+</details>
+
+---
+
+### `get_stock_financials(symbol, consolidated=None)`
+
+Get comprehensive quarterly/annual financial data for a stock, including revenue, expenses, net profit, EPS, and segment-wise breakdowns. It natively fetches historical filings (both modern XBRL and legacy HTML formats).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `symbol` | str | ✅ | Stock ticker symbol (e.g., `"RELIANCE"`, `"TCS"`) |
+| `consolidated` | bool | ❌ | `True` for consolidated, `False` for standalone, `None` for both (default) |
+
+```python
+import asyncio
+from niftyterminal import get_stock_financials
+
+data = asyncio.run(get_stock_financials("RELIANCE", consolidated=True))
+print(f"Total filings fetched: {data['total_filings']}")
+first_filing = data['filings'][0]
+print(f"Latest Revenue: {first_filing['financial_data']['financials']['revenue_from_operations']}")
+```
+
+<details>
+<summary><b>📤 Output</b></summary>
+
+```json
+{
+  "symbol": "RELIANCE",
+  "company_name": "Reliance Industries Limited",
+  "total_filings": 46,
+  "filings": [
+    {
+      "seq_number": "1196162",
+      "from_date": "01-Oct-2024",
+      "to_date": "31-Dec-2024",
+      "nature": "Consolidated",
+      "audited": "Un-Audited",
+      "period": "Quarterly",
+      "format": "New",
+      "financial_data": {
+        "general_info": {
+          "reporting_quarter": "Third quarter",
+          "nature": "Consolidated",
+          "rounding_unit": "Crores"
+        },
+        "financials": {
+          "revenue_from_operations": 2438650000000.0,
+          "total_income": 2469950000000.0,
+          "total_expenses": 2182040000000.0,
+          "net_profit": 219300000000.0
+        },
+        "eps": {
+          "basic_total": 13.7
+        },
+        "segments": {
+          "Digital Services": {
+            "revenue": 381620000000.0,
+            "profit": 74330000000.0
+          }
+        }
+      }
+    }
+  ]
+}
+```
 
 </details>
 
