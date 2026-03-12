@@ -14,18 +14,73 @@ import random
 import httpx
 from typing import Optional, Union, List, Any
 
+# User-Agent rotation pool — realistic browser strings across Chrome/Firefox/Safari
+_USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15",
+]
+
+
+def _random_ua() -> str:
+    return random.choice(_USER_AGENTS)
+
+
 # Browser-like headers to mimic real browser requests
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "User-Agent": _random_ua(),
     "Accept": "application/json, text/javascript, */*; q=0.01",
     "Accept-Language": "en-US,en;q=0.9",
-    "Accept-Encoding": "gzip, deflate",
+    "Accept-Encoding": "gzip, deflate, br",
     "Connection": "keep-alive",
     "X-Requested-With": "XMLHttpRequest",
     "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "cors", 
+    "Sec-Fetch-Mode": "cors",
     "Sec-Fetch-Site": "same-origin",
 }
+
+
+class _SyncRateLimiter:
+    """Enforces a max requests-per-second rate with jitter."""
+
+    def __init__(self, max_rps: float = 3.0):
+        self.min_interval = 1.0 / max_rps
+        self._last: float = 0.0
+
+    def wait(self):
+        elapsed = time.monotonic() - self._last
+        if elapsed < self.min_interval:
+            time.sleep(self.min_interval - elapsed + random.uniform(0, 0.05))
+        self._last = time.monotonic()
+
+
+class _AsyncRateLimiter:
+    """Async version of the rate limiter."""
+
+    def __init__(self, max_rps: float = 3.0):
+        self.min_interval = 1.0 / max_rps
+        self._last: float = 0.0
+        self._lock: Optional[asyncio.Lock] = None
+
+    def _get_lock(self) -> asyncio.Lock:
+        if self._lock is None:
+            self._lock = asyncio.Lock()
+        return self._lock
+
+    async def wait(self):
+        async with self._get_lock():
+            loop = asyncio.get_event_loop()
+            elapsed = loop.time() - self._last
+            if elapsed < self.min_interval:
+                await asyncio.sleep(self.min_interval - elapsed + random.uniform(0, 0.05))
+            self._last = loop.time()
+
+
+# Module-level rate limiters (3 req/s, matching NSE's enforced limit)
+_sync_limiter = _SyncRateLimiter(max_rps=3.0)
+_async_limiter = _AsyncRateLimiter(max_rps=3.0)
 
 # NSE URLs for session warmup
 NSE_BASE_URL = "https://www.nseindia.com"
@@ -39,11 +94,12 @@ WARMUP_DELAY_MAX = 0.2
 
 def _create_session(is_async: bool = False) -> Union[httpx.Client, httpx.AsyncClient]:
     """
-    Create a new httpx session with browser-like headers.
+    Create a new httpx session with browser-like headers and a fresh random User-Agent.
     """
+    headers = {**HEADERS, "User-Agent": _random_ua()}
     if is_async:
-        return httpx.AsyncClient(headers=HEADERS, follow_redirects=True)
-    return httpx.Client(headers=HEADERS, follow_redirects=True)
+        return httpx.AsyncClient(headers=headers, follow_redirects=True)
+    return httpx.Client(headers=headers, follow_redirects=True)
 
 
 async def _awarmup_session(session: httpx.AsyncClient, timeout: int = 10, fast: bool = False) -> bool:
@@ -173,28 +229,40 @@ class AsyncNSESession:
         return False
     
     async def fetch(self, url: str, params: Optional[dict] = None, retries: int = 1) -> dict:
-        """Fetch data using the session."""
+        """Fetch data using the session with rate limiting and explicit 401 handling."""
         if not self._warmed_up:
             if self.use_shared:
                 self.session = await get_shared_client(self.timeout)
                 self._warmed_up = True
             else:
                 self._warmed_up = await _awarmup_session(self.session, timeout=self.timeout, fast=True)
-        
+
         for attempt in range(retries + 1):
             try:
+                await _async_limiter.wait()
                 response = await self.session.get(
-                    url, 
-                    timeout=self.timeout, 
-                    params=params, 
+                    url,
+                    timeout=self.timeout,
+                    params=params,
                     headers={"Referer": NSE_OPTION_CHAIN}
                 )
+
+                if response.status_code == 401:
+                    # Stale cookies — refresh and retry
+                    if attempt < retries:
+                        if self.use_shared:
+                            await refresh_shared_client(self.timeout)
+                            self.session = await get_shared_client(self.timeout)
+                        else:
+                            await _awarmup_session(self.session, timeout=self.timeout, fast=True)
+                    continue
+
                 if response.status_code == 200:
                     try:
                         return response.json()
                     except ValueError:
                         pass
-                
+
                 if attempt < retries:
                     if self.use_shared:
                         await refresh_shared_client(self.timeout)
@@ -210,7 +278,7 @@ class AsyncNSESession:
                     else:
                         await _awarmup_session(self.session, timeout=self.timeout, fast=True)
                     await asyncio.sleep(random.uniform(0.2, 0.4))
-        
+
         return {}
 
 
@@ -274,7 +342,7 @@ async def get_shared_client(timeout: int = 10) -> httpx.AsyncClient:
                     pass
             
             _SHARED_ASYNC_CLIENT = httpx.AsyncClient(
-                headers=HEADERS, 
+                headers={**HEADERS, "User-Agent": _random_ua()},
                 follow_redirects=True,
                 timeout=timeout
             )
@@ -299,18 +367,25 @@ async def refresh_shared_client(timeout: int = 10):
 async def afetch(url: str, timeout: int = 10, params: Optional[dict] = None, retries: int = 2) -> dict:
     """
     Asynchronously fetch data from an NSE API endpoint using a shared session.
-    Automatically handles session refresh on failure.
+    Automatically handles session refresh on failure and enforces rate limiting.
     """
     for attempt in range(retries + 1):
         try:
+            await _async_limiter.wait()
             session = await get_shared_client(timeout)
             response = await session.get(
-                url, 
+                url,
                 params=params,
                 timeout=timeout,
                 headers={"Referer": NSE_OPTION_CHAIN}
             )
-            
+
+            if response.status_code == 401:
+                # Stale cookies — always refresh on 401
+                if attempt < retries:
+                    await refresh_shared_client(timeout)
+                continue
+
             # NSE sometimes returns 200 but with empty or invalid content if cookies are stale
             if response.status_code == 200:
                 try:
@@ -318,38 +393,46 @@ async def afetch(url: str, timeout: int = 10, params: Optional[dict] = None, ret
                 except ValueError:
                     # Stale session or blocked
                     pass
-            
-            # If we get here, the request "failed" in a way that suggests session issues
+
+            # Any other non-200 status → refresh and retry
             if attempt < retries:
                 await refresh_shared_client(timeout)
                 await asyncio.sleep(random.uniform(0.3, 0.5))
-                
+
         except (httpx.HTTPError, Exception):
             if attempt < retries:
                 await refresh_shared_client(timeout)
                 await asyncio.sleep(random.uniform(0.3, 0.5))
-                
+
     return {}
 
 
 def fetch(url: str, timeout: int = 10, params: Optional[dict] = None, retries: int = 2) -> dict:
     """
-    Synchronously fetch data from an NSE API endpoint with session warmup.
+    Synchronously fetch data from an NSE API endpoint with session warmup and rate limiting.
     """
     for attempt in range(retries + 1):
-        with httpx.Client(headers=HEADERS, follow_redirects=True) as session:
+        with _create_session(is_async=False) as session:
             try:
                 if not _warmup_session(session, timeout=timeout, fast=True):
                     if attempt < retries:
                         time.sleep(random.uniform(0.3, 0.5))
                         continue
-                
+
+                _sync_limiter.wait()
                 response = session.get(
-                    url, 
-                    params=params, 
+                    url,
+                    params=params,
                     timeout=timeout,
                     headers={"Referer": NSE_OPTION_CHAIN}
                 )
+
+                if response.status_code == 401:
+                    # Stale cookies — next iteration will create a fresh session
+                    if attempt < retries:
+                        time.sleep(random.uniform(0.3, 0.5))
+                    continue
+
                 response.raise_for_status()
                 return response.json()
             except (httpx.HTTPError, ValueError):
@@ -400,7 +483,7 @@ NIFTY_INDICES_HEADERS = {
     'DNT': '1',
     'X-Requested-With': 'XMLHttpRequest',
     'sec-ch-ua-mobile': '?0',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
     'Content-Type': 'application/json; charset=UTF-8',
     'Origin': 'https://niftyindices.com',
     'Sec-Fetch-Site': 'same-origin',
