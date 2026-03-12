@@ -7,9 +7,10 @@ parsed from NSE's Integrated Filing (iXBRL) pages.
 """
 
 import csv
+import random
 import httpx
 from io import StringIO
-from niftyterminal.core import afetch, afetch_raw
+from niftyterminal.core import afetch
 
 
 # NSE Equity CSV URL
@@ -240,13 +241,17 @@ def _parse_xbrl_xml(xml_text: str) -> dict:
 
     soup = BeautifulSoup(xml_text, "html.parser")
 
-    def _get_val(tag_name: str):
-        """Get float value from a simple (non-segment) XBRL tag."""
-        # Look for tags with contextRef="OneD" or "OneI" (the main period)
-        for tag in soup.find_all(tag_name.lower()):
-            ctx = tag.get("contextref", "")
-            if ctx in ("OneD", "OneI"):
-                return _parse_number(tag.get_text(strip=True))
+    def _get_val(tag_names):
+        """Get float value from a simple (non-segment) XBRL tag(s)."""
+        if isinstance(tag_names, str):
+            tag_names = [tag_names]
+        for tag_name in tag_names:
+            for tag in soup.find_all(tag_name.lower()):
+                ctx = tag.get("contextref", "")
+                if ctx in ("OneD", "OneI"):
+                    val = _parse_number(tag.get_text(strip=True))
+                    if val is not None:
+                        return val
         return None
 
     def _get_text(tag_name: str) -> str:
@@ -273,32 +278,75 @@ def _parse_xbrl_xml(xml_text: str) -> dict:
 
     # --- Main Financials ---
     financials = {
-        "revenue_from_operations": _get_val("in-bse-fin:revenuefromoperations"),
+        "revenue_from_operations": _get_val([
+            "in-bse-fin:revenuefromoperations",
+            "in-bse-fin:interestearned",          # Banking format
+        ]),
         "other_income": _get_val("in-bse-fin:otherincome"),
-        "total_income": _get_val("in-bse-fin:income"),
+        "total_income": _get_val(["in-bse-fin:income", "in-bse-fin:totalincome"]),
         "cost_of_materials_consumed": _get_val("in-bse-fin:costofmaterialsconsumed"),
         "purchases_of_stock_in_trade": _get_val("in-bse-fin:purchasesofstockintrade"),
         "changes_in_inventories": _get_val("in-bse-fin:changesininventoriesoffinishedgoodsworkinprogressandstockintrade"),
-        "employee_benefit_expense": _get_val("in-bse-fin:employeebenefitexpense"),
-        "finance_costs": _get_val("in-bse-fin:financecosts"),
+        "employee_benefit_expense": _get_val([
+            "in-bse-fin:employeebenefitexpense",
+            "in-bse-fin:paymentstoandprovisionsforemployees",
+            "in-bse-fin:employeescost",            # Banking format
+        ]),
+        "finance_costs": _get_val([
+            "in-bse-fin:financecosts",
+            "in-bse-fin:interestexpended",         # Banking format
+        ]),
         "depreciation": _get_val("in-bse-fin:depreciationdepletionandamortisationexpense"),
-        "other_expenses": _get_val("in-bse-fin:otherexpenses"),
-        "total_expenses": _get_val("in-bse-fin:expenses"),
-        "profit_before_exceptional_items_and_tax": _get_val("in-bse-fin:profitbeforeexceptionalitemsandtax"),
-        "exceptional_items": _get_val("in-bse-fin:exceptionalitemsbeforetax"),
-        "profit_before_tax": _get_val("in-bse-fin:profitbeforetax"),
+        "other_expenses": _get_val([
+            "in-bse-fin:otherexpenses",
+            "in-bse-fin:otheroperatingexpenses",   # Banking format
+            "in-bse-fin:operatingexpenses",
+        ]),
+        "total_expenses": _get_val([
+            "in-bse-fin:expenses",
+            "in-bse-fin:totalexpenditure",
+            "in-bse-fin:expenditureexcludingprovisionsandcontingencies",  # Banking format
+        ]),
+        "profit_before_exceptional_items_and_tax": _get_val([
+            "in-bse-fin:profitbeforeexceptionalitemsandtax",
+            "in-bse-fin:operatingprofitlossbeforeprovisionsandcontingencies",
+            "in-bse-fin:operatingprofitbeforeprovisionandcontingencies",  # Banking format
+        ]),
+        "exceptional_items": _get_val([
+            "in-bse-fin:exceptionalitemsbeforetax",
+            "in-bse-fin:exceptionalitems",         # Banking format
+        ]),
+        "profit_before_tax": _get_val([
+            "in-bse-fin:profitbeforetax",
+            "in-bse-fin:netprofitlossbeforetax",
+            "in-bse-fin:profitlossfromordinaryactivitiesbeforetax",  # Banking format
+        ]),
         "current_tax": _get_val("in-bse-fin:currenttax"),
         "deferred_tax": _get_val("in-bse-fin:deferredtax"),
-        "tax_expense": _get_val("in-bse-fin:taxexpense"),
+        "tax_expense": _get_val(["in-bse-fin:taxexpense", "in-bse-fin:provisionfortaxes"]),
         "net_profit_continuing_operations": _get_val("in-bse-fin:profitlossforperiodfromcontinuingoperations"),
         "profit_discontinued_before_tax": _get_val("in-bse-fin:profitlossfromdiscontinuedoperationsbeforetax"),
         "profit_discontinued_after_tax": _get_val("in-bse-fin:profitlossfromdiscontinuedoperationsaftertax"),
-        "share_of_profit_associates": _get_val("in-bse-fin:shareofprofitlossofassociatesandjointventuresaccountedforusingequitymethod"),
-        "net_profit": _get_val("in-bse-fin:profitlossforperiod"),
+        "share_of_profit_associates": _get_val([
+            "in-bse-fin:shareofprofitlossofassociatesandjointventuresaccountedforusingequitymethod",
+            "in-bse-fin:shareofprofitlossofassociates",  # Banking format
+        ]),
+        "net_profit": _get_val([
+            "in-bse-fin:profitlossforperiod",
+            "in-bse-fin:netprofitlossforperiod",
+            "in-bse-fin:profitlossfortheperiod",              # Banking format
+            "in-bse-fin:profitlossfromordinaryactivitiesaftertax",  # Banking format alt
+        ]),
         "other_comprehensive_income": _get_val("in-bse-fin:othercomprehensiveincomenetoftaxes"),
         "total_comprehensive_income": _get_val("in-bse-fin:comprehensiveincomefortheperiod"),
-        "profit_attributable_to_owners": _get_val("in-bse-fin:profitorlossattributabletoownersofparent"),
-        "profit_attributable_to_nci": _get_val("in-bse-fin:profitorlossattributabletononcontrollinginterests"),
+        "profit_attributable_to_owners": _get_val([
+            "in-bse-fin:profitorlossattributabletoownersofparent",
+            "in-bse-fin:profitlossaftertaxesminorityinterestandshareofprofitlossofassociates",  # Banking format
+        ]),
+        "profit_attributable_to_nci": _get_val([
+            "in-bse-fin:profitorlossattributabletononcontrollinginterests",
+            "in-bse-fin:profitlossofminorityinterest",  # Banking format
+        ]),
         "comprehensive_income_owners": _get_val("in-bse-fin:comprehensiveincomefortheperiodattributabletoownersofparent"),
         "comprehensive_income_nci": _get_val("in-bse-fin:comprehensiveincomefortheperiodattributabletoownersofparentnoncontrollinginterests"),
     }
@@ -311,13 +359,54 @@ def _parse_xbrl_xml(xml_text: str) -> dict:
 
     # --- EPS ---
     eps = {
-        "basic_continuing": _get_val("in-bse-fin:basicearningslossperSharefromcontinuingoperations"),
-        "diluted_continuing": _get_val("in-bse-fin:dilutedearningslossperSharefromcontinuingoperations"),
+        "basic_continuing": _get_val([
+            "in-bse-fin:basicearningslossperSharefromcontinuingoperations",
+            "in-bse-fin:basicearningspersharebeforeextraordinaryitems",  # Banking format
+        ]),
+        "diluted_continuing": _get_val([
+            "in-bse-fin:dilutedearningslossperSharefromcontinuingoperations",
+            "in-bse-fin:dilutedearningspersharebeforeextraordinaryitems",  # Banking format
+        ]),
         "basic_discontinued": _get_val("in-bse-fin:basicearningslosspersharefromdiscontinuedoperations"),
         "diluted_discontinued": _get_val("in-bse-fin:dilutedearningslosspersharefromdiscontinuedoperations"),
-        "basic_total": _get_val("in-bse-fin:basicearningslosspersharefromcontinuinganddiscontinuedoperations"),
-        "diluted_total": _get_val("in-bse-fin:dilutedearningslosspersharefromcontinuinganddiscontinuedoperations"),
+        "basic_total": _get_val([
+            "in-bse-fin:basicearningslosspersharefromcontinuinganddiscontinuedoperations",
+            "in-bse-fin:basicearningslosspershare",
+            "in-bse-fin:basicearningspershare",
+            "in-bse-fin:earningsperequitysharebasic",
+            "in-bse-fin:basicearningspershareafterextraordinaryitems",   # Banking format
+        ]),
+        "diluted_total": _get_val([
+            "in-bse-fin:dilutedearningslosspersharefromcontinuinganddiscontinuedoperations",
+            "in-bse-fin:dilutedearningslosspershare",
+            "in-bse-fin:dilutedearningspershare",
+            "in-bse-fin:earningsperequitysharediluted",
+            "in-bse-fin:dilutedearningspershareafterextraordinaryitems",  # Banking format
+        ]),
     }
+
+    # Catch-all EPS parsing if exact tags weren't hit (often the case for different XML variants)
+    if not eps["basic_total"]:
+        for tag in soup.find_all(True):  # Find all tags
+            tag_name = tag.name.lower()
+            if "basic" in tag_name and ("earning" in tag_name or "eps" in tag_name):
+                ctx = tag.get("contextref", "")
+                if ctx in ("OneD", "OneI"):
+                    val = _parse_number(tag.get_text(strip=True))
+                    if val is not None:
+                        eps["basic_total"] = val
+                        break
+
+    if not eps["diluted_total"]:
+        for tag in soup.find_all(True):
+            tag_name = tag.name.lower()
+            if "diluted" in tag_name and ("earning" in tag_name or "eps" in tag_name):
+                ctx = tag.get("contextref", "")
+                if ctx in ("OneD", "OneI"):
+                    val = _parse_number(tag.get_text(strip=True))
+                    if val is not None:
+                        eps["diluted_total"] = val
+                        break
 
     # --- Segments ---
     segments = {}
@@ -593,6 +682,42 @@ def _parse_legacy_html(html: str) -> dict:
     }
 
 
+_XBRL_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Connection": "keep-alive",
+    "Referer": "https://www.nseindia.com/",
+}
+
+
+async def _fetch_with_backoff(url: str, timeout: int = 15) -> str:
+    """
+    Fetch raw content with exponential backoff on rate-limit responses (429/503).
+
+    Retries up to 3 times. On 429/503, waits 2^attempt * jitter seconds before
+    retrying. On other errors, waits a short random delay.
+    """
+    import asyncio
+
+    for attempt in range(3):
+        try:
+            async with httpx.AsyncClient(
+                headers=_XBRL_HEADERS, follow_redirects=True
+            ) as client:
+                resp = await client.get(url, timeout=timeout)
+                if resp.status_code in (429, 503):
+                    wait = (2 ** attempt) * random.uniform(1.0, 2.0)
+                    await asyncio.sleep(wait)
+                    continue
+                if resp.status_code == 200:
+                    return resp.text
+        except Exception:
+            if attempt < 2:
+                await asyncio.sleep(random.uniform(0.5, 1.0))
+    return ""
+
+
 async def _fetch_financial_detail(filing: dict) -> dict:
     """
     Fetch and parse financial detail for a single filing.
@@ -603,14 +728,14 @@ async def _fetch_financial_detail(filing: dict) -> dict:
     # Try XBRL XML first
     if _has_valid_xbrl(filing):
         xbrl_url = filing["xbrl"]
-        xml_text = await afetch_raw(xbrl_url, timeout=15)
+        xml_text = await _fetch_with_backoff(xbrl_url, timeout=15)
         if xml_text:
             return _parse_xbrl_xml(xml_text)
 
     # Fall back to legacy HTML
     html_url = filing.get("resultDetailedDataLink")
     if html_url:
-        html = await afetch_raw(html_url, timeout=15)
+        html = await _fetch_with_backoff(html_url, timeout=15)
         if html:
             return _parse_legacy_html(html)
 
@@ -695,9 +820,13 @@ async def get_stock_financials(symbol: str, consolidated: bool = None) -> dict:
 
     company_name = filings_raw[0].get("companyName", "")
 
-    # Fetch & parse all filings concurrently
+    # Fetch & parse all filings concurrently, with a semaphore to prevent NSE rate-limiting
+    sem = asyncio.Semaphore(2)
+
     async def _process_filing(filing: dict) -> dict:
-        financial_data = await _fetch_financial_detail(filing)
+        async with sem:
+            await asyncio.sleep(random.uniform(0.5, 1.5))
+            financial_data = await _fetch_financial_detail(filing)
 
         return {
             "seq_number": filing.get("seqNumber"),
