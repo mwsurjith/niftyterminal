@@ -169,7 +169,7 @@ async def get_all_index_quote() -> dict:
 
 
 # NSE Equity Master API endpoint (for index list)
-INDEX_MASTER_URL = "https://www.nseindia.com/api/equity-masterOR"
+INDEX_MASTER_URL = "https://www.nseindia.com/api/equity-master"
 
 # Categories to skip (not actual indices)
 SKIP_CATEGORIES = {"Others"}

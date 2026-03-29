@@ -1,0 +1,181 @@
+{
+  "symbol": "ONGC",
+  "total_filings": 2,
+  "filings": [
+    {
+      "quarter_ended": "31 Mar 2025",
+      "nature": "Standalone",
+      "audited": "Audited",
+      "filing_date": "21-May-2025 23:10",
+      "xbrl_url": "https://nsearchives.nseindia.com/corporate/xbrl/INTEGRATED_FILING_INDAS_1446447_21052025111038_WEB.xml",
+      "xbrl_file_size": null,
+      "summary": {
+        "total_income": 1483257300000.0,
+        "profit_before_tax": 467598100000.0,
+        "net_profit": 356103200000.0,
+        "eps": 28.31
+      },
+      "financial_data": {
+        "general_info": {
+          "symbol": "ONGC",
+          "company_name": "Oil & Natural Gas Corporation Limited",
+          "fy_start": "2024-04-01",
+          "fy_end": "2025-03-31",
+          "from_date": "2025-01-01",
+          "to_date": "2025-03-31",
+          "reporting_quarter": "Fourth quarter",
+          "reporting_period_type": "Quarterly",
+          "nature": "Standalone",
+          "audited": "Audited",
+          "rounding": "Crores",
+          "currency": "INR"
+        },
+        "filing_type": "INDAS",
+        "profit_and_loss": {
+          "revenue_from_operations": 349822300000.0,
+          "other_income": 20746900000.0,
+          "total_income": 370569200000.0,
+          "cost_of_materials_consumed": 11194700000.0,
+          "purchases_of_stock_in_trade": 0.0,
+          "changes_in_inventories": 549600000.0,
+          "employee_benefit_expense": 5783200000.0,
+          "finance_costs": 11900900000.0,
+          "depreciation": 60785300000.0,
+          "other_expenses": 192681200000.0,
+          "total_expenses": 282894900000.0,
+          "profit_before_exceptional_items_and_tax": 87674300000.0,
+          "exceptional_items": 0.0,
+          "profit_before_tax": 87674300000.0,
+          "current_tax": 32058800000.0,
+          "deferred_tax": -8867300000.0,
+          "tax_expense": 23191500000.0,
+          "net_profit_continuing": 64482800000.0,
+          "profit_discontinued_before_tax": 0.0,
+          "profit_discontinued_after_tax": 0.0,
+          "share_of_profit_associates": 0.0,
+          "net_profit": 64482800000.0,
+          "other_comprehensive_income": -22325900000.0,
+          "total_comprehensive_income": 42156900000.0,
+          "paid_up_capital": 62901400000.0,
+          "face_value": 5.0,
+          "eps_basic": 5.13,
+          "eps_diluted": 5.13,
+          "debt_equity_ratio": 0.0003
+        },
+        "balance_sheet": {
+          "non_current_assets": {
+            "property_plant_equipment": 1899264800000.0,
+            "capital_work_in_progress": 289960200000.0,
+            "investment_property": 0.0,
+            "goodwill": 0.0,
+            "other_intangible_assets": 2402100000.0,
+            "intangible_assets_under_development": 210638000000.0,
+            "investments": 1126781100000.0,
+            "loans": 20829100000.0,
+            "other_financial_assets": 306801000000.0,
+            "total_financial_assets": 1454411200000.0,
+            "deferred_tax_assets": 122375100000.0,
+            "other_non_current_assets": 7861000000.0,
+            "total": 3986912400000.0
+          },
+          "current_assets": {
+            "inventories": 115213200000.0,
+            "investments": 0.0,
+            "trade_receivables": 102838000000.0,
+            "cash_and_cash_equivalents": 100800000.0,
+            "bank_balances_other": 154855500000.0,
+            "loans": 3098400000.0,
+            "other_financial_assets": 107521500000.0,
+            "total_financial_assets": 368414200000.0,
+            "other_current_assets": 45987800000.0,
+            "total": 529615200000.0
+          },
+          "total_assets": 4516527600000.0,
+          "equity": {
+            "share_capital": 62901400000.0,
+            "other_equity": 3099934400000.0,
+            "equity_attributable_to_owners": 3162835800000.0,
+            "total": 3162835800000.0
+          },
+          "non_current_liabilities": {
+            "borrowings": 35597900000.0,
+            "other_financial_liabilities": 201354800000.0,
+            "total_financial_liabilities": 236952700000.0,
+            "provisions": 505320400000.0,
+            "deferred_tax_liabilities": 232613500000.0,
+            "other_non_current_liabilities": 76200000.0,
+            "total": 974962800000.0
+          },
+          "current_liabilities": {
+            "borrowings": 48478900000.0,
+            "trade_payables": 56488400000.0,
+            "trade_payables_msme": 3551100000.0,
+            "trade_payables_others": 52937300000.0,
+            "other_financial_liabilities": 218646600000.0,
+            "total_financial_liabilities": 323613900000.0,
+            "other_current_liabilities": 25997800000.0,
+            "provisions": 29117300000.0,
+            "total": 378729000000.0
+          },
+          "total_liabilities": 1353691800000.0,
+          "total_equity_and_liabilities": 4516527600000.0
+        },
+        "cash_flow": {
+          "type": "Cash Flow Indirect",
+          "operating": {
+            "profit_before_tax": 467598100000.0,
+            "adj_depreciation": 243524400000.0,
+            "adj_finance_costs": 46039700000.0,
+            "adj_impairment": 28052300000.0,
+            "adj_unrealised_forex": 8815200000.0,
+            "adj_fair_value": 1650600000.0,
+            "adj_inventories": -8405000000.0,
+            "adj_trade_receivables_current": 10944200000.0,
+            "adj_other_current_assets": 8729400000.0,
+            "adj_trade_payables_current": 74709100000.0,
+            "adj_other_financial_liabilities_current": -11059400000.0,
+            "adj_provisions_current": -172500000.0,
+            "total_adjustments": 401702000000.0,
+            "cash_from_operations": 869300100000.0,
+            "dividends_received": -34603900000.0,
+            "interest_received": -48766600000.0,
+            "income_tax_paid": 130626800000.0,
+            "other": 74799600000.0,
+            "net_cash": 730102400000.0
+          },
+          "investing": {
+            "purchase_ppe": 272157700000.0,
+            "sale_ppe": 1383600000.0,
+            "purchase_intangibles": 141057700000.0,
+            "obtaining_subsidiaries": 229652800000.0,
+            "dividends_received": 34603900000.0,
+            "interest_received": 46291400000.0,
+            "other": 2832200000.0,
+            "net_cash": -467889000000.0
+          },
+          "financing": {
+            "proceeds_from_borrowings": 22268900000.0,
+            "lease_payments": 96234000000.0,
+            "dividends_paid": 169847400000.0,
+            "interest_paid": 2294200000.0,
+            "other": -16351400000.0,
+            "net_cash": -262458100000.0
+          },
+          "net_increase_decrease": -244700000.0,
+          "cash_at_beginning": 345500000.0,
+          "cash_at_end": 100800000.0
+        },
+        "segments": {
+          "a) Offshore": {
+            "revenue": 956272600000.0,
+            "profit": 383828900000.0
+          },
+          "b) Onshore": {
+            "revenue": 422190300000.0,
+            "profit": 66889700000.0
+          }
+        }
+      }
+    }
+  ]
+}

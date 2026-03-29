@@ -1,173 +1,80 @@
 <p align="center">
-  <h1 align="center">📈 Nifty Terminal</h1>
+  <img src="https://raw.githubusercontent.com/mwsurjith/niftyterminal/main/.github/logo.png" alt="Nifty Terminal Logo" width="120" onerror="this.src='https://em-content.zobj.net/source/microsoft-teams/363/chart-increasing_1f4c8.png'; this.width=80;">
+  <h1 align="center">Nifty Terminal</h1>
   <p align="center">
-    <strong>A comprehensive Python library for NSE India market data</strong>
+    <strong>The Pythonic gateway to Indian Market Data</strong>
   </p>
   <p align="center">
-    Access Index, Equity, ETF, Commodity & Historical data from official NSE India APIs
+    High-fidelity Index, Equity, ETF, and Fundamental data directly from NSE India APIs.
   </p>
 </p>
 
 <p align="center">
   <a href="https://pypi.org/project/niftyterminal/">
-    <img src="https://img.shields.io/badge/PyPI-v0.2.1-blue" alt="PyPI Version">
+    <img src="https://img.shields.io/pypi/v/niftyterminal?color=007ec6&style=for-the-badge" alt="PyPI Version">
   </a>
   <a href="https://pypi.org/project/niftyterminal/">
-    <img src="https://img.shields.io/badge/Python-3.9%2B-blue" alt="Python Versions">
+    <img src="https://img.shields.io/pypi/pyversions/niftyterminal?color=3776ab&style=for-the-badge" alt="Python Versions">
   </a>
   <a href="https://github.com/mwsurjith/niftyterminal/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
+    <img src="https://img.shields.io/github/license/mwsurjith/niftyterminal?color=4caf50&style=for-the-badge" alt="License">
   </a>
 </p>
 
 ---
 
-## ✨ Features
+## ✨ Why Nifty Terminal?
 
-| Category | Features |
-|----------|----------|
-| 🏛️ **Market** | Market status, trading hours |
-| 📊 **Indices** | List, quotes, historical OHLCV, PE/PB/DY ratios, constituents |
-| 📈 **Equities** | Complete stock list, quotes, historical data |
-| 💰 **ETFs** | All ETFs with smart asset categorization (Gold, Silver, Index, International) |
-| 🪙 **Commodities** | Commodity list, spot prices, historical data |
-| 📉 **VIX** | India VIX historical data |
+Most NSE scrapers break due to strict session requirements, Akamai protection, or inconsistent API responses. **Nifty Terminal** is built to solve these problems specifically:
+
+- 🛡️ **Zero-Config Session Handling:** Automatically manages cookies and session handshakes for NSE India and Nifty Indices.
+- ⚡ **Async-First Architecture:** Built on top of `httpx` and `asyncio` for high-performance concurrent data fetching.
+- 📊 **Unified Fundamentals:** Normalizes modern XBRL and legacy HTML filings into consistent JSON objects.
+- 🏷️ **Smart Categorization:** Automatically tags ETFs by asset class (Gold, Silver, Index) and variants (TRI, Alpha, Value).
 
 ---
 
-## 🚀 Quick Start
-
-### Installation
+## 📦 Installation
 
 ```bash
 pip install niftyterminal
 ```
 
-### Basic Usage
-
-```python
-from niftyterminal import get_market_status, get_index_historical_data
-
-# Check if market is open
-status = get_market_status()
-print(f"Market is {status['marketStatus']}")
-
-# Get NIFTY 50 historical data with PE/PB/DY
-data = get_index_historical_data("NIFTY 50", "2025-01-01", "2025-12-31")
-for row in data['indexData']:
-    print(f"{row['date']}: Close={row['close']}, PE={row['PE']}")
-```
-
 ---
 
-## 📚 Table of Contents
+## ⚡ Quick Start
 
-- [Market](#get_market_status)
-- [Indices](#index-functions)
-  - [Get Index List](#get_index_list)
-  - [Get All Index Quote](#get_all_index_quote)
-  - [Get Index Historical Data](#get_index_historical_dataindex_symbol-start_date-end_date)
-  - [Get Index Stocks](#get_index_stocksindex_symbol)
-- [VIX](#get_vix_historical_datastart_date-end_date)
-- [ETFs](#get_all_etfs)
-- [Equities](#get_stocks_list)
-  - [Get Stocks List](#get_stocks_list)
-  - [Get Stock Quote](#get_stock_quotesymbol)
-  - [Get Stock Financials](#get_stock_financialssymbol-consolidated)
-- [Commodities](#commodity-functions)
-  - [Get Commodity List](#get_commodity_list)
-  - [Get Commodity Historical Data](#get_commodity_historical_datasymbol-start_date-end_date)
-- [Disclaimer](#disclaimer)
-- [License](#license)
+Almost all functions in `niftyterminal` are **asynchronous**. Here's how to fetch NIFTY 50 historical data with PE ratios:
+
+```python
+import asyncio
+from niftyterminal import get_index_historical_data
+
+async def main():
+    # Fetch NIFTY 50 history for Q1 2025
+    data = await get_index_historical_data("NIFTY 50", "2025-01-01", "2025-03-31")
+    
+    for day in data['indexData']:
+        print(f"{day['date']}: {day['close']} (PE: {day['PE']})")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
 
 ---
 
 ## 📖 API Reference
 
-### `get_market_status()`
+### 🏛️ Market & Indices
 
-Get the current Capital Market status from NSE India.
+#### `get_market_status()`
+Get current Capital Market status (Open/Closed/Halt).
 
-```python
-from niftyterminal import get_market_status
-
-status = get_market_status()
-print(status)
-```
+#### `get_all_index_quote()`
+Quotes for all indices including OHLC, PE/PB/DY, and historical comparisons.
 
 <details>
-<summary><b>📤 Output</b></summary>
-
-```json
-{
-  "marketStatus": "Close",
-  "marketStatusMessage": "Market is Closed"
-}
-```
-
-| Field | Description |
-|-------|-------------|
-| `marketStatus` | Current status: `"Open"`, `"Close"`, etc. |
-| `marketStatusMessage` | Detailed status message |
-
-</details>
-
----
-
-## Index Functions
-
-### `get_index_list()`
-
-Get the master list of all indices with their category and derivatives eligibility.
-
-```python
-from niftyterminal import get_index_list
-
-data = get_index_list()
-```
-
-<details>
-<summary><b>📤 Output</b></summary>
-
-```json
-{
-  "indexList": [
-    {
-      "indexName": "NIFTY 50",
-      "subType": "Broad Market Indices",
-      "derivativesEligiblity": true
-    },
-    {
-      "indexName": "NIFTY BANK",
-      "subType": "Broad Market Indices",
-      "derivativesEligiblity": true
-    }
-  ]
-}
-```
-
-| Field | Description |
-|-------|-------------|
-| `indexName` | Full name of the index |
-| `subType` | Category: `Broad Market`, `Sectoral`, `Thematic`, `Strategy`, `Fixed Income` |
-| `derivativesEligiblity` | `true` if eligible for F&O trading |
-
-</details>
-
----
-
-### `get_all_index_quote()`
-
-Get comprehensive quote data for all indices including OHLC, valuation metrics (PE/PB/DY), and historical comparison data.
-
-```python
-from niftyterminal import get_all_index_quote
-
-data = get_all_index_quote()
-```
-
-<details>
-<summary><b>📤 Output</b></summary>
+<summary><b>📤 View Sample Output</b></summary>
 
 ```json
 {
@@ -178,461 +85,107 @@ data = get_all_index_quote()
       "date": "2026-01-02",
       "open": 26155.1,
       "high": 26340,
-      "low": 26118.4,
       "ltp": 26328.55,
-      "prevClose": 26146.55,
-      "change": 182,
-      "percentChange": 0.7,
       "pe": "22.92",
       "pb": "3.58",
       "dy": "1.28",
-      "oneWeekAgoPercentChange": 1.1,
-      "30dAgoPercentChange": 1.14,
-      "365dAgoPercentChange": 10.89
+      "oneWeekAgoPercentChange": 1.1
     }
   ]
 }
 ```
-
-| Field | Description |
-|-------|-------------|
-| `ltp` | Last traded price |
-| `percentChange` | Percentage change from previous close |
-| `pe` / `pb` / `dy` | PE ratio, PB ratio, Dividend Yield |
-| `oneWeekAgoPercentChange` | Percent change from 1 week ago |
-| `30dAgoPercentChange` | Percent change from 30 days ago |
-| `365dAgoPercentChange` | Percent change from 365 days ago |
-
 </details>
+
+#### `get_index_historical_data(symbol, start, end)`
+Historical OHLC and Valuation data from Nifty Indices.
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `symbol` | `str` | Yes | e.g., `"NIFTY 50"`, `"NIFTY BANK"` |
+| `start` | `str` | Yes | `YYYY-MM-DD` |
+| `end` | `str` | No | Defaults to today |
 
 ---
 
-### `get_index_historical_data(index_symbol, start_date, end_date)`
+### 📈 Equities & ETFs
 
-Get historical OHLC, valuation data (PE, PB, Dividend Yield), and Total Returns Index for any index.
+#### `get_stock_quote(symbol)`
+Detailed metadata, price, and sector info for a specific stock.
 
-> **Note:** This function fetches data from Nifty Indices (niftyindices.com), which often provides more complete historical data than NSE India.
+#### `get_all_etfs()`
+Lists all ETFs with smart metadata for easy filtering.
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `index_symbol` | str | ✅ | Index name (e.g., `"NIFTY 50"`, `"NIFTY BANK"`) |
-| `start_date` | str | ✅ | Start date in `YYYY-MM-DD` format |
-| `end_date` | str | ❌ | End date in `YYYY-MM-DD` format (defaults to today) |
+> [!TIP]
+> Filter ETFs by `underlyingAsset` (e.g., `GOLD`) or `indexVariant` (e.g., `TRI`) to find exactly what you need.
 
-```python
-from niftyterminal import get_index_historical_data
-
-# With date range
-data = get_index_historical_data("NIFTY 50", "2025-01-01", "2026-01-03")
-
-# Without end date (defaults to today)
-data = get_index_historical_data("NIFTY BANK", "2024-01-01")
-```
-
-<details>
-<summary><b>📤 Output</b></summary>
-
-```json
-{
-  "indexData": [
-    {
-      "indexName": "Nifty 50",
-      "date": "2024-12-05",
-      "open": "24539.15",
-      "high": "24857.75",
-      "low": "24295.55",
-      "close": "24708.40",
-      "PE": "22.74",
-      "PB": "3.68",
-      "divYield": "1.24",
-      "totalReturnsIndex": "36737.18"
-    }
-  ]
-}
-```
-
-| Field | Description |
-|-------|-------------|
-| `date` | Trading date in `YYYY-MM-DD` format |
-| `open` / `high` / `low` / `close` | OHLC values |
-| `PE` / `PB` / `divYield` | Valuation metrics |
-| `totalReturnsIndex` | Total Returns Index value (includes dividends reinvested) |
-
-</details>
+#### `get_etf_historical_data(symbol, start, end)`
+Historical price data specifically for ETFs.
 
 ---
 
-### `get_index_stocks(index_symbol)`
+### 🏦 Fundamentals & Financials
 
-Get the list of constituent stocks for an index.
+> [!IMPORTANT]
+> Financial data is extracted from Integrated Filing XBRL sources, ensuring the highest accuracy for fundamental analysis.
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `index_symbol` | str | ✅ | Index symbol (e.g., `"NIFTY 50"`, `"NIFTY BANK"`) |
+#### `get_stock_financials(symbol, consolidated, period)`
+Quarterly or Annual P&L with segment-wise breakdown. Handles modern and legacy filings seamlessly.
 
-```python
-from niftyterminal import get_index_stocks
-
-data = get_index_stocks("NIFTY 50")
-```
+#### `get_stock_annual_report(symbol, consolidated)`
+Unified call to fetch Profit & Loss, Balance Sheet, and Cash Flow in one go.
 
 <details>
-<summary><b>📤 Output</b></summary>
-
-```json
-{
-  "indexName": "NIFTY 50",
-  "date": "2026-01-07",
-  "stockList": [
-    {
-      "symbol": "TITAN",
-      "companyName": "Titan Company Limited",
-      "isin": "INE280A01028"
-    }
-  ]
-}
-```
-
-| Field | Description |
-|-------|-------------|
-| `symbol` | Stock ticker symbol |
-| `companyName` | Full company name |
-| `isin` | ISIN code |
-
-</details>
-
----
-
-### `get_vix_historical_data(start_date, end_date)`
-
-Get historical India VIX data.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `start_date` | str | ✅ | Start date in `YYYY-MM-DD` format |
-| `end_date` | str | ❌ | End date in `YYYY-MM-DD` format (defaults to today) |
-
-```python
-from niftyterminal import get_vix_historical_data
-
-data = get_vix_historical_data("2025-01-01", "2025-04-16")
-```
-
-<details>
-<summary><b>📤 Output</b></summary>
-
-```json
-{
-  "vixData": [
-    {
-      "indexName": "INDIA VIX",
-      "date": "2025-04-11",
-      "open": 21.43,
-      "high": 21.43,
-      "low": 18.855,
-      "close": 20.11
-    }
-  ]
-}
-```
-
-| Field | Description |
-|-------|-------------|
-| `date` | Trading date in `YYYY-MM-DD` format |
-| `open` / `high` / `low` / `close` | VIX OHLC values |
-
-</details>
-
----
-
-### `get_all_etfs()`
-
-Get list of all ETFs with smart asset categorization for easy filtering.
-
-```python
-from niftyterminal import get_all_etfs
-
-data = get_all_etfs()
-
-# Filter by asset type
-gold_etfs = [e for e in data['etfs'] if e['underlyingAsset'] == 'GOLD']
-nifty_50_etfs = [e for e in data['etfs'] if e['underlyingAsset'] == 'NIFTY_50']
-```
-
-<details>
-<summary><b>📤 Output</b></summary>
-
-```json
-{
-  "date": "2026-01-02",
-  "etfs": [
-    {
-      "symbol": "NIFTYBEES",
-      "companyName": "Nippon India ETF Nifty BeES",
-      "assetType": "EquityIndex",
-      "underlyingAsset": "NIFTY_50",
-      "indexVariant": "TRI",
-      "listingDate": "2002-01-08",
-      "isFNOSec": true
-    }
-  ]
-}
-```
-
-| Field | Values |
-|-------|--------|
-| `assetType` | `Commodity`, `EquityIndex`, `DebtIndex`, `Liquid`, `International` |
-| `underlyingAsset` | `GOLD`, `SILVER`, `NIFTY_50`, `SENSEX`, `NASDAQ_100`, etc. |
-| `indexVariant` | `TRI`, `EqualWeight`, `Momentum`, `Quality`, `Value`, `LowVol`, `Alpha` |
-
-</details>
-
----
-
-### `get_stocks_list()`
-
-Get the complete list of all listed stocks on NSE.
-
-```python
-from niftyterminal import get_stocks_list
-
-data = get_stocks_list()
-print(f"Total stocks: {len(data['stockList'])}")
-```
-
-<details>
-<summary><b>📤 Output</b></summary>
-
-```json
-{
-  "stockList": [
-    {
-      "symbol": "20MICRONS",
-      "companyName": "20 Microns Limited",
-      "series": "EQ",
-      "isin": "INE144J01027"
-    }
-  ]
-}
-```
-
-| Field | Description |
-|-------|-------------|
-| `symbol` | Stock ticker symbol |
-| `companyName` | Full company name |
-| `series` | Trading series: `EQ`, `BE`, `BZ` |
-| `isin` | ISIN code |
-
-</details>
-
----
-
-### `get_stock_quote(symbol)`
-
-Get quote and detailed information for a specific stock including current price, market cap, sector classification, and trading status.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `symbol` | str | ✅ | Stock ticker symbol (e.g., `"RELIANCE"`, `"TCS"`) |
-
-```python
-from niftyterminal import get_stock_quote
-
-data = get_stock_quote("20MICRONS")
-print(f"LTP: {data['ltp']}, Change: {data['percentChange']}%")
-```
-
-<details>
-<summary><b>📤 Output</b></summary>
-
-```json
-{
-  "symbol": "20MICRONS",
-  "companyName": "20 Microns Limited",
-  "series": "EQ",
-  "listingDate": "2008-10-06",
-  "isin": "INE144J01027",
-  "faceValue": 5,
-  "marketCap": 7209032358.6,
-  "secStatus": "Listed",
-  "industry": "Industrial Minerals",
-  "sector": "Metals & Mining",
-  "sectorPe": "11.69",
-  "industryInfo": "Minerals & Mining",
-  "macro": "Commodities",
-  "tradingSegment": "Normal Market",
-  "isFNOSec": false,
-  "isSLBSec": false,
-  "isSuspended": false,
-  "isETFSec": false,
-  "open": 206.9,
-  "high": 209.89,
-  "low": 202.51,
-  "ltp": 204.3,
-  "prevClose": 207.54,
-  "change": -3.24,
-  "percentChange": -1.56,
-  "pe": "11.86"
-}
-```
-
-| Field | Description |
-|-------|-------------|
-| `ltp` | Last traded price |
-| `change` / `percentChange` | Price change |
-| `pe` | Stock PE ratio |
-| `marketCap` | Total market capitalization |
-| `sector` / `industry` | Sector and industry classification |
-| `isFNOSec` | Eligible for F&O trading |
-
-</details>
-
----
-
-### `get_stock_financials(symbol, consolidated=None)`
-
-Get comprehensive quarterly/annual financial data for a stock, including revenue, expenses, net profit, EPS, and segment-wise breakdowns. It natively fetches historical filings (both modern XBRL and legacy HTML formats).
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `symbol` | str | ✅ | Stock ticker symbol (e.g., `"RELIANCE"`, `"TCS"`) |
-| `consolidated` | bool | ❌ | `True` for consolidated, `False` for standalone, `None` for both (default) |
-
-```python
-import asyncio
-from niftyterminal import get_stock_financials
-
-data = asyncio.run(get_stock_financials("RELIANCE", consolidated=True))
-print(f"Total filings fetched: {data['total_filings']}")
-first_filing = data['filings'][0]
-print(f"Latest Revenue: {first_filing['financial_data']['financials']['revenue_from_operations']}")
-```
-
-<details>
-<summary><b>📤 Output</b></summary>
+<summary><b>📤 View Financial Data Model</b></summary>
 
 ```json
 {
   "symbol": "RELIANCE",
-  "company_name": "Reliance Industries Limited",
-  "total_filings": 46,
   "filings": [
     {
-      "seq_number": "1196162",
-      "from_date": "01-Oct-2024",
-      "to_date": "31-Dec-2024",
-      "nature": "Consolidated",
-      "audited": "Un-Audited",
       "period": "Quarterly",
-      "format": "New",
       "financial_data": {
-        "general_info": {
-          "reporting_quarter": "Third quarter",
-          "nature": "Consolidated",
-          "rounding_unit": "Crores"
-        },
         "financials": {
           "revenue_from_operations": 2438650000000.0,
-          "total_income": 2469950000000.0,
-          "total_expenses": 2182040000000.0,
           "net_profit": 219300000000.0
         },
-        "eps": {
-          "basic_total": 13.7
-        },
-        "segments": {
-          "Digital Services": {
-            "revenue": 381620000000.0,
-            "profit": 74330000000.0
-          }
-        }
+        "segments": { ... }
       }
     }
   ]
 }
 ```
-
 </details>
 
 ---
 
-## Commodity Functions
+### 🪙 Specialized Data
 
-### `get_commodity_list()`
-
-Get the list of all commodity symbols from NSE.
-
-```python
-from niftyterminal import get_commodity_list
-
-data = get_commodity_list()
-print([c['symbol'] for c in data['commodityList']])
-# Output: ['ALUMINI', 'GOLD', 'SILVER', 'CRUDEOIL', ...]
-```
+- **`get_vix_historical_data()`**: India VIX historical trends.
+- **`get_commodity_historical_data()`**: Spot prices for Gold/Silver/etc. on NSE.
 
 ---
 
-### `get_commodity_historical_data(symbol, start_date, end_date)`
+## 🛠️ Technical Highlights
 
-Get historical spot price data for a commodity.
+### Robust Session Management
+NSE India requires a "warm-up" phase where initial cookies are obtained from the homepage before API requests are accepted. `niftyterminal` implements an automated `BypassSession` that:
+1. Performs a headless handshake with NSE.
+2. Manages persistent cookies across requests.
+3. Automatically switches between `nseindia.com` and `niftyindices.com` sessions.
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `symbol` | str | ✅ | Commodity symbol (e.g., `"GOLD1G"`, `"SILVER"`) |
-| `start_date` | str | ✅ | Start date in `YYYY-MM-DD` format |
-| `end_date` | str | ❌ | End date (defaults to today) |
-
-```python
-from niftyterminal import get_commodity_historical_data
-
-data = get_commodity_historical_data("GOLD1G", "2025-12-28", "2026-01-04")
-```
-
-<details>
-<summary><b>📤 Output</b></summary>
-
-```json
-{
-  "commodityData": [
-    {
-      "symbol": "GOLD1G",
-      "unit": "1 Grams",
-      "spotPrice1": 13442,
-      "spotPrice2": 13460,
-      "date": "2026-01-02"
-    }
-  ]
-}
-```
-
-| Field | Description |
-|-------|-------------|
-| `symbol` | Commodity symbol |
-| `unit` | Unit of measurement |
-| `spotPrice1` / `spotPrice2` | Spot prices |
-| `date` | Date (`YYYY-MM-DD`) |
-
-</details>
+### Data Normalization
+Stock market filing formats change over time. Our parsers are trained on:
+- **New Format (XBRL):** High-precision extraction of line items.
+- **Old Format (HTML):** Intelligent mapping to the new schema for historical continuity.
 
 ---
 
 ## ⚠️ Disclaimer
 
-> [!CAUTION]
-> - This library is **not affiliated with, endorsed by, or associated with** the National Stock Exchange of India (NSE) or any other financial institution.
-> - It **does not provide** financial, trading, or investment advice. Verify data independently before making financial decisions.
-> - It only retrieves **publicly available data** without authentication or bypassing security measures.
-> - Users are responsible for ensuring compliance with applicable laws and the data provider's terms of service.
-> - **Use at your own risk.**
-
----
-
-## 📄 License
-
-[MIT License](LICENSE) © 2025
+This library is for **educational and research purposes only**. It is not affiliated with, maintained, or endorsed by NSE India. Use market data responsibly and adhere to the [NSE Terms of Service](https://www.nseindia.com/terms-of-use).
 
 ---
 
 <p align="center">
-  Made with ❤️ for the Indian trading community
+  Built with ❤️ for Indian Quants.
 </p>

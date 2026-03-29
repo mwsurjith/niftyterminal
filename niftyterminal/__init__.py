@@ -5,7 +5,7 @@ This library provides easy-to-use functions to fetch market data from NSE India'
 with built-in session management, cookie warmup, and robust error handling.
 """
 
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 __author__ = "Surjith"
 
 # Public API exports
@@ -19,6 +19,11 @@ from niftyterminal.api.indices import (
 from niftyterminal.api.vix import get_vix_historical_data
 from niftyterminal.api.etf import get_all_etfs, get_etf_historical_data
 from niftyterminal.api.stocks import get_stocks_list, get_stock_quote, get_stock_financials
+from niftyterminal.api.fundamentals import (
+    get_stock_balance_sheet,
+    get_stock_cash_flow,
+    get_stock_annual_report,
+)
 from niftyterminal.api.commodity import get_commodity_list, get_commodity_historical_data
 from niftyterminal.exceptions import (
     NiftyTerminalError,
@@ -41,6 +46,9 @@ __all__ = [
     "get_stocks_list",
     "get_stock_quote",
     "get_stock_financials",
+    "get_stock_balance_sheet",
+    "get_stock_cash_flow",
+    "get_stock_annual_report",
     "get_commodity_list",
     "get_commodity_historical_data",
     # Exceptions

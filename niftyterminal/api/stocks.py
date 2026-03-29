@@ -11,6 +11,12 @@ import random
 import httpx
 from io import StringIO
 from niftyterminal.core import afetch
+from niftyterminal.api._utils import (
+    parse_number as _parse_number,
+    has_valid_xbrl as _has_valid_xbrl,
+    XBRL_HEADERS as _XBRL_HEADERS,
+    fetch_with_backoff as _fetch_with_backoff,
+)
 
 
 # NSE Equity CSV URL
@@ -188,44 +194,8 @@ CORPORATES_FINANCIAL_URL = (
 )
 
 
-def _parse_number(value_str: str):
-    """
-    Convert a number string to a float.
 
-    Handles:
-      - Commas: "29,26,400.00" → 2926400.0
-      - Parenthesized negatives: "(2,68,600.00)" → -268600.0
-      - Scientific notation: "1.92388E7" → 19238800.0
-      - Dashes: "-" → None
-      - Empty / null → None
-    """
-    if not value_str:
-        return None
-
-    s = value_str.strip()
-    if not s or s.lower() == "null" or s == "-":
-        return None
-
-    negative = False
-    if s.startswith("(") and s.endswith(")"):
-        negative = True
-        s = s[1:-1]
-
-    s = s.replace(",", "").replace("\xa0", "").strip()
-    if not s:
-        return None
-
-    try:
-        val = float(s)
-        return -val if negative else val
-    except ValueError:
-        return None
-
-
-def _has_valid_xbrl(filing: dict) -> bool:
-    """Check if a filing has a valid XBRL URL (not the placeholder '-' URL)."""
-    xbrl = filing.get("xbrl", "")
-    return bool(xbrl) and not xbrl.endswith("/-") and not xbrl.endswith("/-\"")
+# _parse_number, _has_valid_xbrl imported from _utils
 
 
 def _parse_xbrl_xml(xml_text: str) -> dict:
@@ -682,40 +652,8 @@ def _parse_legacy_html(html: str) -> dict:
     }
 
 
-_XBRL_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Accept-Encoding": "gzip, deflate",
-    "Connection": "keep-alive",
-    "Referer": "https://www.nseindia.com/",
-}
 
-
-async def _fetch_with_backoff(url: str, timeout: int = 15) -> str:
-    """
-    Fetch raw content with exponential backoff on rate-limit responses (429/503).
-
-    Retries up to 3 times. On 429/503, waits 2^attempt * jitter seconds before
-    retrying. On other errors, waits a short random delay.
-    """
-    import asyncio
-
-    for attempt in range(3):
-        try:
-            async with httpx.AsyncClient(
-                headers=_XBRL_HEADERS, follow_redirects=True
-            ) as client:
-                resp = await client.get(url, timeout=timeout)
-                if resp.status_code in (429, 503):
-                    wait = (2 ** attempt) * random.uniform(1.0, 2.0)
-                    await asyncio.sleep(wait)
-                    continue
-                if resp.status_code == 200:
-                    return resp.text
-        except Exception:
-            if attempt < 2:
-                await asyncio.sleep(random.uniform(0.5, 1.0))
-    return ""
+# _XBRL_HEADERS, _fetch_with_backoff imported from _utils
 
 
 async def _fetch_financial_detail(filing: dict) -> dict:
@@ -742,7 +680,7 @@ async def _fetch_financial_detail(filing: dict) -> dict:
     return {}
 
 
-async def get_stock_financials(symbol: str, consolidated: bool = None) -> dict:
+async def get_stock_financials(symbol: str, consolidated: bool = None, period: str = "Quarterly") -> dict:
     """
     Get quarterly/annual financial results for a stock.
 
@@ -756,6 +694,7 @@ async def get_stock_financials(symbol: str, consolidated: bool = None) -> dict:
             None  → fetch both standalone and consolidated filings (default)
             True  → fetch only consolidated filings
             False → fetch only standalone filings
+        period: "Quarterly" (default), "Annual", or "Both".
 
     Returns:
         {
@@ -787,21 +726,52 @@ async def get_stock_financials(symbol: str, consolidated: bool = None) -> dict:
     import asyncio
     from urllib.parse import quote
 
+    if period not in ("Quarterly", "Annual", "Both"):
+        period = "Quarterly"
+
     # Fetch the filing list — issuer is derived from symbol via the API
-    url = (
-        f"{CORPORATES_FINANCIAL_URL}"
-        f"?index=equities"
-        f"&symbol={quote(symbol)}"
-        f"&period=Quarterly"
-    )
+    if period == "Both":
+        # Fetch both quarterly and annual, merge results
+        url_q = (
+            f"{CORPORATES_FINANCIAL_URL}"
+            f"?index=equities"
+            f"&symbol={quote(symbol)}"
+            f"&period=Quarterly"
+        )
+        url_a = (
+            f"{CORPORATES_FINANCIAL_URL}"
+            f"?index=equities"
+            f"&symbol={quote(symbol)}"
+            f"&period=Annual"
+        )
+        resp_q, resp_a = await asyncio.gather(
+            afetch(url_q, timeout=15),
+            afetch(url_a, timeout=15),
+        )
+        raw_q = resp_q if isinstance(resp_q, list) else (resp_q.get("data", []) if resp_q else [])
+        raw_a = resp_a if isinstance(resp_a, list) else (resp_a.get("data", []) if resp_a else [])
+        # Deduplicate by seqNumber
+        seen = set()
+        filings_raw = []
+        for f in raw_q + raw_a:
+            seq = f.get("seqNumber")
+            if seq not in seen:
+                seen.add(seq)
+                filings_raw.append(f)
+    else:
+        url = (
+            f"{CORPORATES_FINANCIAL_URL}"
+            f"?index=equities"
+            f"&symbol={quote(symbol)}"
+            f"&period={period}"
+        )
+        response = await afetch(url, timeout=15)
 
-    response = await afetch(url, timeout=15)
+        if not response:
+            return {}
 
-    if not response:
-        return {}
-
-    # The API returns a list directly (not wrapped in a "data" key)
-    filings_raw = response if isinstance(response, list) else response.get("data", [])
+        # The API returns a list directly (not wrapped in a "data" key)
+        filings_raw = response if isinstance(response, list) else response.get("data", [])
 
     if not filings_raw:
         return {}

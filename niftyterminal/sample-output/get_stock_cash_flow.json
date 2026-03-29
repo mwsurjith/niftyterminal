@@ -1,0 +1,76 @@
+{
+  "symbol": "ONGC",
+  "total_filings": 1,
+  "filings": [
+    {
+      "quarter_ended": "31 Mar 2025",
+      "nature": "Standalone",
+      "audited": "Audited",
+      "filing_date": "21-May-2025 23:10",
+      "general_info": {
+        "symbol": "ONGC",
+        "company_name": "Oil & Natural Gas Corporation Limited",
+        "fy_start": "2024-04-01",
+        "fy_end": "2025-03-31",
+        "nature": "Standalone",
+        "audited": "Audited",
+        "rounding": "Crores",
+        "currency": "INR"
+      },
+      "cash_flow": {
+        "type": "Cash Flow Indirect",
+        "operating": {
+          "profit_before_tax": 467598100000.0,
+          "adj_depreciation": 243524400000.0,
+          "adj_finance_costs": 46039700000.0,
+          "adj_interest_income": 0.0,
+          "adj_dividend_income": 0.0,
+          "adj_impairment": 28052300000.0,
+          "adj_unrealised_forex": 8815200000.0,
+          "adj_fair_value": 1650600000.0,
+          "adj_inventories": -8405000000.0,
+          "adj_trade_receivables_current": 10944200000.0,
+          "adj_other_current_assets": 8729400000.0,
+          "adj_trade_payables_current": 74709100000.0,
+          "adj_other_financial_liabilities_current": -11059400000.0,
+          "adj_provisions_current": -172500000.0,
+          "total_adjustments": 401702000000.0,
+          "cash_from_operations": 869300100000.0,
+          "dividends_received": -34603900000.0,
+          "interest_paid": 0.0,
+          "interest_received": -48766600000.0,
+          "income_tax_paid": 130626800000.0,
+          "other": 74799600000.0,
+          "net_cash": 730102400000.0
+        },
+        "investing": {
+          "purchase_ppe": 272157700000.0,
+          "sale_ppe": 1383600000.0,
+          "purchase_intangibles": 141057700000.0,
+          "sale_intangibles": 0.0,
+          "purchase_other_long_term_assets": -89950100000.0,
+          "purchase_joint_ventures": 82000000.0,
+          "obtaining_subsidiaries": 229652800000.0,
+          "dividends_received": 34603900000.0,
+          "interest_received": 46291400000.0,
+          "other": 2832200000.0,
+          "net_cash": -467889000000.0
+        },
+        "financing": {
+          "proceeds_from_borrowings": 22268900000.0,
+          "repayment_of_borrowings": 0.0,
+          "lease_payments": 96234000000.0,
+          "dividends_paid": 169847400000.0,
+          "interest_paid": 2294200000.0,
+          "other": -16351400000.0,
+          "net_cash": -262458100000.0
+        },
+        "net_increase_decrease_before_forex": -244700000.0,
+        "forex_effect": 0.0,
+        "net_increase_decrease": -244700000.0,
+        "cash_at_beginning": 345500000.0,
+        "cash_at_end": 100800000.0
+      }
+    }
+  ]
+}

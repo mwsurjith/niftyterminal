@@ -11,6 +11,11 @@ from niftyterminal.api.vix import get_vix_historical_data
 from niftyterminal.api.etf import get_all_etfs, get_etf_historical_data
 from niftyterminal.api.stocks import get_stocks_list, get_stock_quote, get_stock_financials
 from niftyterminal.api.commodity import get_commodity_list, get_commodity_historical_data
+from niftyterminal.api.fundamentals import (
+    get_stock_balance_sheet,
+    get_stock_cash_flow,
+    get_stock_annual_report,
+)
 
 __all__ = [
     "get_market_status",
@@ -24,6 +29,9 @@ __all__ = [
     "get_stocks_list",
     "get_stock_quote",
     "get_stock_financials",
+    "get_stock_balance_sheet",
+    "get_stock_cash_flow",
+    "get_stock_annual_report",
     "get_commodity_list",
     "get_commodity_historical_data",
 ]
